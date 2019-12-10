@@ -145,7 +145,7 @@ class minimize(Minimizer, CovmatSampler):
         self.log.info(
             dict(zip(self.model.parameterization.sampled_params(), initial_point)))
 
-        bounds = self.model.prior.bounds(
+        self._bounds = self.model.prior.bounds(
             confidence_for_unbounded=self.confidence_for_unbounded)
 
         # TODO: if ignore_prior, one should use *like* covariance (this is *post*)
@@ -153,7 +153,7 @@ class minimize(Minimizer, CovmatSampler):
 
         # scale by conditional parameter widths (since not using correlation structure)
         scales = np.minimum(1 / np.sqrt(np.diag(np.linalg.inv(covmat))),
-                            (bounds[:, 1] - bounds[:, 0]) / 3)
+                            (self._bounds[:, 1] - self._bounds[:, 0]) / 3)
 
         # Cov and affine transformation
         # Transform to space where initial point is at centre, and cov is normalised
@@ -165,11 +165,9 @@ class minimize(Minimizer, CovmatSampler):
         self.affine_transform = lambda x: ((x - self._affine_transform_baseline) / scales)
         self.inv_affine_transform = lambda x: (
                 x * scales + self._affine_transform_baseline)
-        # Re-scale
-        self.logp_transf = lambda x: self.logp(self.inv_affine_transform(x))
         initial_point = self.affine_transform(initial_point)
         np.testing.assert_allclose(initial_point, np.zeros(initial_point.shape))
-        bounds = np.array([self.affine_transform(bounds[:, i]) for i in range(2)]).T
+        bounds = np.array([self.affine_transform(self._bounds[:, i]) for i in range(2)]).T
         # Configure method
         if self.method.lower() == "bobyqa":
             self.minimizer = pybobyqa.solve
@@ -202,6 +200,11 @@ class minimize(Minimizer, CovmatSampler):
             raise LoggedError(
                 self.log, "Method '%s' not recognized. Try one of %r.", self.method,
                 methods)
+
+    def logp_transf(self, x):
+        # fix up rounding errors on bounds
+        return self.logp(
+            np.clip(self.inv_affine_transform(x), self._bounds[:, 0], self._bounds[:, 1]))
 
     def run(self):
         """
