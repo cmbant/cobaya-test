@@ -61,6 +61,7 @@ class CovmatSampler(Sampler):
         params_infos = self.model.parameterization.sampled_params_info()
         covmat = np.diag([np.nan] * len(params_infos))
         # Try to generate it automatically
+        self.covmat = getattr(self, 'covmat', None)
         if isinstance(self.covmat, six.string_types) and self.covmat.lower() == "auto":
             slow_params_info = {
                 p: info for p, info in params_infos.items() if p in slow_params}
@@ -174,7 +175,6 @@ class CovmatSampler(Sampler):
         return None
 
 
-
 class mcmc(CovmatSampler):
     ignore_at_resume = Sampler.ignore_at_resume + [
         "burn_in", "callback_function", "callback_every", "max_tries",
@@ -213,10 +213,10 @@ class mcmc(CovmatSampler):
                     raise LoggedError(self.log, "MPI use requires MPI version 3.0 or "
                                                 "higher to support IALLGATHER.")
         sync_processes()
-        if not self.resuming and self.output:
+        if not self.resuming and self.output and is_main_process():
             # Delete previous files (if not "forced", the run would have already failed)
             if (os.path.abspath(self.covmat_filename()) != os.path.abspath(
-                    str(self.covmat)) and is_main_process()):
+                    str(self.covmat))):
                 try:
                     os.remove(self.covmat_filename())
                 except OSError:
