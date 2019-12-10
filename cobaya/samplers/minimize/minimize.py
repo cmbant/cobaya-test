@@ -87,10 +87,13 @@ from copy import deepcopy
 
 # Local
 from cobaya.sampler import Minimizer
-from cobaya.mpi import get_mpi_size, get_mpi_comm, is_main_process
-from cobaya.collection import OnePoint
+from cobaya.mpi import get_mpi_size, get_mpi_comm, is_main_process, get_mpi_rank, \
+    more_than_one_process, share_mpi
+from cobaya.collection import OnePoint, Collection
 from cobaya.log import LoggedError
 from cobaya.tools import read_dnumber, choleskyL, recursive_update
+from cobaya.conventions import _covmat_extension
+from cobaya.samplers.mcmc.mcmc import CovmatSampler
 
 # Handling scpiy vs BOBYQA
 evals_attr = {"scipy": "fun", "bobyqa": "f"}
@@ -99,7 +102,7 @@ evals_attr = {"scipy": "fun", "bobyqa": "f"}
 getdist_ext_ignore_prior = {True: ".bestfit", False: ".minimum"}
 
 
-class minimize(Minimizer):
+class minimize(Minimizer, CovmatSampler):
     def initialize(self):
         """Prepares the arguments for `scipy.minimize`."""
         if is_main_process():
@@ -114,10 +117,18 @@ class minimize(Minimizer):
         # Try to load info from previous samples.
         # If none, sample from reference (make sure that it has finite like/post)
         initial_point = None
-        covmat = None
         if self.output:
-            collection_in = self.output.load_collections(
-                self.model, skip=0, thin=1, concatenate=True)
+            files = self.output.find_collections()
+            collection_in = None
+            if files:
+                if more_than_one_process():
+                    if 1 + get_mpi_rank() <= len(files):
+                        collection_in = Collection(
+                            self.model, self.output, name=str(1 + get_mpi_rank()),
+                            resuming=True)
+                else:
+                    collection_in = self.output.load_collections(self.model,
+                                                                 concatenate=True)
             if collection_in:
                 initial_point = (
                     collection_in.bestfit() if self.ignore_prior else collection_in.MAP())
@@ -125,8 +136,7 @@ class minimize(Minimizer):
                     list(self.model.parameterization.sampled_params())].values
                 self.log.info("Starting from %s of previous chain:",
                               "best fit" if self.ignore_prior else "MAP")
-                # TODO: if ignore_prior, one should use *like* covariance (this is *post*)
-                covmat = collection_in.cov()
+
         if initial_point is None:
             this_logp = -np.inf
             while not np.isfinite(this_logp):
@@ -135,16 +145,20 @@ class minimize(Minimizer):
             self.log.info("Starting from random initial point:")
         self.log.info(
             dict(zip(self.model.parameterization.sampled_params(), initial_point)))
+
+        # TODO: if ignore_prior, one should use *like* covariance (this is *post*)
+        covmat = self._load_covmat(self.output)[0]
+
         # Cov and affine transformation
         self._affine_transform_matrix = None
         self._inv_affine_transform_matrix = None
         self._affine_transform_baseline = None
-        if covmat is None:
-            # Use as much info as we have from ref & prior
-            covmat = self.model.prior.reference_covmat()
         # Transform to space where initial point is at centre, and cov is normalised
-        sigmas_diag, L = choleskyL(covmat, return_scale_free=True)
-        self._affine_transform_matrix = np.linalg.inv(sigmas_diag)
+        # Cannot do rotation, as supported minimization routines assume bounds aligned
+        # with the parameter axes.
+        # sigmas_diag, _ = choleskyL(covmat, return_scale_free=True)
+        sigmas_diag = np.diag(np.sqrt(np.diag(covmat)))
+        self._affine_transform_matrix = np.diag(1 / np.sqrt(np.diag(covmat)))
         self._inv_affine_transform_matrix = sigmas_diag
         self._affine_transform_baseline = initial_point
         self.affine_transform = lambda x: (
@@ -157,6 +171,7 @@ class minimize(Minimizer):
         # Re-scale
         self.logp_transf = lambda x: self.logp(self.inv_affine_transform(x))
         initial_point = self.affine_transform(initial_point)
+        np.testing.assert_allclose(initial_point, np.zeros(initial_point.shape))
         bounds = np.array([self.affine_transform(bounds[:, i]) for i in range(2)]).T
         # Configure method
         if self.method.lower() == "bobyqa":
