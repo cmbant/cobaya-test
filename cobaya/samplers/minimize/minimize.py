@@ -145,26 +145,26 @@ class minimize(Minimizer, CovmatSampler):
         self.log.info(
             dict(zip(self.model.parameterization.sampled_params(), initial_point)))
 
+        bounds = self.model.prior.bounds(
+            confidence_for_unbounded=self.confidence_for_unbounded)
+
         # TODO: if ignore_prior, one should use *like* covariance (this is *post*)
         covmat = self._load_covmat(self.output)[0]
 
+        # scale by conditional parameter widths (since not using correlation structure)
+        scales = np.minimum(1 / np.sqrt(np.diag(np.linalg.inv(covmat))),
+                            (bounds[:, 1] - bounds[:, 0]) / 3)
+
         # Cov and affine transformation
-        self._affine_transform_baseline = None
         # Transform to space where initial point is at centre, and cov is normalised
         # Cannot do rotation, as supported minimization routines assume bounds aligned
         # with the parameter axes.
-        # scale by conditional parameter widths (since not using correlation structure)
-        self._affine_transform_matrix = np.diag(np.sqrt(np.diag(np.linalg.inv(covmat))))
-        self._inv_affine_transform_matrix = np.diag(
-            1 / np.diag(self._affine_transform_matrix))
+        self._affine_transform_matrix = np.diag(1 / scales)
+        self._inv_affine_transform_matrix = np.diag(scales)
         self._affine_transform_baseline = initial_point
-        self.affine_transform = lambda x: (
-            self._affine_transform_matrix.dot(x - self._affine_transform_baseline))
+        self.affine_transform = lambda x: ((x - self._affine_transform_baseline) / scales)
         self.inv_affine_transform = lambda x: (
-                self._inv_affine_transform_matrix.dot(
-                    x) + self._affine_transform_baseline)
-        bounds = self.model.prior.bounds(
-            confidence_for_unbounded=self.confidence_for_unbounded)
+                x * scales + self._affine_transform_baseline)
         # Re-scale
         self.logp_transf = lambda x: self.logp(self.inv_affine_transform(x))
         initial_point = self.affine_transform(initial_point)
