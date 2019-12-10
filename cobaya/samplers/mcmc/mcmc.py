@@ -254,7 +254,7 @@ class mcmc(CovmatSampler):
         sampled_list = list(self.model.parameterization.sampled_params())
         if self.oversample:
             self.oversampling_factors = speeds
-            self.log.info("Oversampling with factors:\n" + "\n".join([
+            self.mpi_info("Oversampling with factors:\n" + "\n".join([
                 "   %d : %r" % (f, b) for f, b in
                 zip(self.oversampling_factors, blocks)]))
             self.i_last_slow_block = None
@@ -286,12 +286,12 @@ class mcmc(CovmatSampler):
             drag_limits = [(int(lim) * len(fast_params) if lim is not None else lim)
                            for lim in self.drag_limits]
             if drag_limits[0] is not None and self.drag_interp_steps < drag_limits[0]:
-                self.log.warning("Number of dragging steps clipped from below: was not "
+                self.mpi_warning("Number of dragging steps clipped from below: was not "
                                  "enough to efficiently explore the fast directions -- "
                                  "avoid this limit by decreasing 'drag_limits[0]'.")
                 self.drag_interp_steps = drag_limits[0]
             if drag_limits[1] is not None and self.drag_interp_steps > drag_limits[1]:
-                self.log.warning("Number of dragging steps clipped from above: "
+                self.mpi_warning("Number of dragging steps clipped from above: "
                                  "excessive, probably inefficient, exploration of the "
                                  "fast directions -- "
                                  "avoid this limit by increasing 'drag_limits[1]'.")
@@ -302,10 +302,9 @@ class mcmc(CovmatSampler):
             for p in ["check_every", "callback_every"]:
                 setattr(self, p,
                         int(getattr(self, p) * self.n_slow / self.model.prior.d()))
-            if is_main_process():
-                self.log.info("Dragging with factor %g oversampling per step: %r",
-                              self.drag_interp_steps, fast_params)
-                self.log.info("Slow parameters: %r", slow_params)
+            self.mpi_info("Dragging with factor %g oversampling per step: %r",
+                          self.drag_interp_steps, fast_params)
+            self.mpi_info("Slow parameters: %r", slow_params)
             self.get_new_sample = self.get_new_sample_dragging
         else:
             self.oversampling_factors = np.ones(len(blocks), dtype=int)
@@ -320,14 +319,13 @@ class mcmc(CovmatSampler):
         covmat, where_nan = self._load_covmat(self.resuming, slow_params)
         if np.any(where_nan) and self.learn_proposal:
             # we want to start learning the covmat earlier
-            if is_main_process():
-                self.log.info("Covariance matrix " +
-                              ("not present" if np.all(where_nan) else "not complete") +
-                              ". "
-                              "We will start learning the covariance of the proposal "
-                              "earlier: R-1 = %g (was %g).",
-                              self.learn_proposal_Rminus1_max_early,
-                              self.learn_proposal_Rminus1_max)
+            self.mpi_info("Covariance matrix " +
+                          ("not present" if np.all(where_nan) else "not complete") +
+                          ". "
+                          "We will start learning the covariance of the proposal "
+                          "earlier: R-1 = %g (was %g).",
+                          self.learn_proposal_Rminus1_max_early,
+                          self.learn_proposal_Rminus1_max)
             self.learn_proposal_Rminus1_max = self.learn_proposal_Rminus1_max_early
 
         self.log.debug(
@@ -413,8 +411,7 @@ class mcmc(CovmatSampler):
             Ns = (lambda x: np.array(get_mpi_comm().gather(x)))(self.n())
         else:
             Ns = [self.n()]
-        if is_main_process():
-            self.log.info("Sampling complete after %d accepted steps.", sum(Ns))
+        self.mpi_info("Sampling complete after %d accepted steps.", sum(Ns))
 
     def n(self, burn_in=False):
         """
@@ -777,9 +774,8 @@ class mcmc(CovmatSampler):
             good_Rminus1 = (self.learn_proposal_Rminus1_max >
                             self.Rminus1_last > self.learn_proposal_Rminus1_min)
             if not good_Rminus1:
-                if is_main_process():
-                    self.log.info("Bad convergence statistics: "
-                                  "waiting until the next checkpoint.")
+                self.mpi_info("Bad convergence statistics: "
+                              "waiting until the next checkpoint.")
                 return
             if more_than_one_process():
                 if not is_main_process():

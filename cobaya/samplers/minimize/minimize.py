@@ -105,8 +105,7 @@ getdist_ext_ignore_prior = {True: ".bestfit", False: ".minimum"}
 class minimize(Minimizer, CovmatSampler):
     def initialize(self):
         """Prepares the arguments for `scipy.minimize`."""
-        if is_main_process():
-            self.log.info("Initializing")
+        self.mpi_info("Initializing")
         self.max_evals = read_dnumber(self.max_evals, self.model.prior.d())
         # Configure target
         method = self.model.loglike if self.ignore_prior else self.model.logpost
@@ -150,16 +149,14 @@ class minimize(Minimizer, CovmatSampler):
         covmat = self._load_covmat(self.output)[0]
 
         # Cov and affine transformation
-        self._affine_transform_matrix = None
-        self._inv_affine_transform_matrix = None
         self._affine_transform_baseline = None
         # Transform to space where initial point is at centre, and cov is normalised
         # Cannot do rotation, as supported minimization routines assume bounds aligned
         # with the parameter axes.
-        # sigmas_diag, _ = choleskyL(covmat, return_scale_free=True)
-        sigmas_diag = np.diag(np.sqrt(np.diag(covmat)))
-        self._affine_transform_matrix = np.diag(1 / np.sqrt(np.diag(covmat)))
-        self._inv_affine_transform_matrix = sigmas_diag
+        # scale by conditional parameter widths (since not using correlation structure)
+        self._affine_transform_matrix = np.diag(np.sqrt(np.diag(np.linalg.inv(covmat))))
+        self._inv_affine_transform_matrix = np.diag(
+            1 / np.diag(self._affine_transform_matrix))
         self._affine_transform_baseline = initial_point
         self.affine_transform = lambda x: (
             self._affine_transform_matrix.dot(x - self._affine_transform_baseline))
@@ -333,7 +330,8 @@ class minimize(Minimizer, CovmatSampler):
         lines.append('')
         labels = self.model.parameterization.labels()
         label_list = list(labels.keys())
-        if hasattr(params, 'chi2_names'): label_list += params.chi2_names
+        if hasattr(params, 'chi2_names'):
+            label_list += params.chi2_names
         width = max([len(lab) for lab in label_list]) + 2
 
         def add_section(pars):
