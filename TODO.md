@@ -21,3 +21,4 @@
 ## specify how to calibrate speed factors (2018 defaults looks wrong, TTTEEE slower than TT)
 ## If non-linear lensing on, model the non-linear correction via limber for faster semi-slow parameters
 ## minimize run with -f does not work. Check resuming.
+## minimize success array checking

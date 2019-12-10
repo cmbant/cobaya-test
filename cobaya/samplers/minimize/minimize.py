@@ -161,10 +161,8 @@ class minimize(Minimizer, CovmatSampler):
         # with the parameter axes.
         self._affine_transform_matrix = np.diag(1 / scales)
         self._inv_affine_transform_matrix = np.diag(scales)
+        self._scales = scales
         self._affine_transform_baseline = initial_point
-        self.affine_transform = lambda x: ((x - self._affine_transform_baseline) / scales)
-        self.inv_affine_transform = lambda x: (
-                x * scales + self._affine_transform_baseline)
         initial_point = self.affine_transform(initial_point)
         np.testing.assert_allclose(initial_point, np.zeros(initial_point.shape))
         bounds = np.array([self.affine_transform(self._bounds[:, i]) for i in range(2)]).T
@@ -201,10 +199,17 @@ class minimize(Minimizer, CovmatSampler):
                 self.log, "Method '%s' not recognized. Try one of %r.", self.method,
                 methods)
 
+    def affine_transform(self, x):
+        return (x - self._affine_transform_baseline) / self._scales
+
+    def inv_affine_transform(self, x):
+        # fix up rounding errors on bounds to avoid -np.inf likelihoods
+        return np.clip(x * self._scales + self._affine_transform_baseline,
+                       self._bounds[:, 0], self._bounds[:, 1])
+
     def logp_transf(self, x):
         # fix up rounding errors on bounds
-        return self.logp(
-            np.clip(self.inv_affine_transform(x), self._bounds[:, 0], self._bounds[:, 1]))
+        return self.logp(self.inv_affine_transform(x))
 
     def run(self):
         """
@@ -255,20 +260,23 @@ class minimize(Minimizer, CovmatSampler):
             return
         if get_mpi_size():
             results = get_mpi_comm().gather(self.result, root=0)
-            _inv_affine_transform_matrices = get_mpi_comm().gather(
-                self._inv_affine_transform_matrix, root=0)
+            successes = get_mpi_comm().gather(self.success, root=0)
             _affine_transform_baselines = get_mpi_comm().gather(
                 self._affine_transform_baseline, root=0)
             if is_main_process():
-                i_min = np.argmin([getattr(r, evals_attr_) for r in results])
+                i_min = np.argmin([(getattr(r, evals_attr_) if s else np.inf)
+                                   for r, s in zip(results, successes)])
                 self.result = results[i_min]
-                self._inv_affine_transform_matrix = _inv_affine_transform_matrices[i_min]
                 self._affine_transform_baseline = _affine_transform_baselines[i_min]
+        else:
+            successes = [self.success]
         if is_main_process():
-            if not self.success:
+            if not any(successes):
                 raise LoggedError(
                     self.log, "Minimization failed! Here is the raw result object:\n%s",
                     str(self.result))
+            elif not all(successes):
+                self.log.warning('Some minimizations failed!')
             logp_min = -np.array(getattr(self.result, evals_attr_))
             x_min = self.inv_affine_transform(self.result.x)
             self.log.info("-log(%s) minimized to %g",
@@ -279,7 +287,7 @@ class minimize(Minimizer, CovmatSampler):
             if not np.allclose(logp_min, recomputed_logp_min):
                 raise LoggedError(
                     self.log,
-                    "Cannot reproduce result. Maybe yout likelihood is stochastic? "
+                    "Cannot reproduce result. Maybe your likelihood is stochastic? "
                     "Recomputed min: %g (was %g) at %r",
                     recomputed_logp_min, logp_min, x_min)
             self.minimum = OnePoint(
