@@ -302,9 +302,10 @@ class mcmc(CovmatSampler):
             for p in ["check_every", "callback_every"]:
                 setattr(self, p,
                         int(getattr(self, p) * self.n_slow / self.model.prior.d()))
-            self.log.info("Dragging with factor %g oversampling per step: %r",
-                          self.drag_interp_steps, fast_params)
-            self.log.info("Slow parameters: %r", slow_params)
+            if is_main_process():
+                self.log.info("Dragging with factor %g oversampling per step: %r",
+                              self.drag_interp_steps, fast_params)
+                self.log.info("Slow parameters: %r", slow_params)
             self.get_new_sample = self.get_new_sample_dragging
         else:
             self.oversampling_factors = np.ones(len(blocks), dtype=int)
@@ -319,13 +320,14 @@ class mcmc(CovmatSampler):
         covmat, where_nan = self._load_covmat(self.resuming, slow_params)
         if np.any(where_nan) and self.learn_proposal:
             # we want to start learning the covmat earlier
-            self.log.info("Covariance matrix " +
-                          ("not present" if np.all(where_nan) else "not complete") +
-                          ". "
-                          "We will start learning the covariance of the proposal "
-                          "earlier: R-1 = %g (was %g).",
-                          self.learn_proposal_Rminus1_max_early,
-                          self.learn_proposal_Rminus1_max)
+            if is_main_process():
+                self.log.info("Covariance matrix " +
+                              ("not present" if np.all(where_nan) else "not complete") +
+                              ". "
+                              "We will start learning the covariance of the proposal "
+                              "earlier: R-1 = %g (was %g).",
+                              self.learn_proposal_Rminus1_max_early,
+                              self.learn_proposal_Rminus1_max)
             self.learn_proposal_Rminus1_max = self.learn_proposal_Rminus1_max_early
 
         self.log.debug(
