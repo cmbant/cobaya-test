@@ -48,7 +48,7 @@ except ImportError:
 # Quit with C-c
 signal.signal(signal.SIGINT, signal.SIG_DFL)
 
-# Color map for correlatins
+# Color map for correlations
 cmap_corr = cmap.get_cmap("coolwarm_r")
 
 

@@ -106,12 +106,6 @@ class mcmc(CovmatSampler):
                     self.log,
                     "Cannot resume a run with a different number of chains: "
                     "was %d and now is %d.", max(self.mpi_size or 0, 1), mpi.size())
-            if more_than_one_process():
-                if get_mpi().Get_version()[0] < 3 \
-                        and 'Microsoft' not in get_mpi().Get_library_version():
-                    # Microsoft MPI currently only supports all MPI 2 but has IALLGATHER
-                    raise LoggedError(self.log, "MPI use requires MPI version 3.0 or "
-                                                "higher to support IALLGATHER.")
         sync_processes()
         # One collection per MPI process: `name` is the MPI rank + 1
         name = str(1 + mpi.rank())

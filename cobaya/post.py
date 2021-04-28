@@ -475,9 +475,9 @@ def post(info_or_yaml_or_file: Union[InputDict, str, os.PathLike],
                                          - collection_out[_minuslogpost]))
         done += len(collection_in)
 
-        # Reweight -- account for large dynamic range!
-        #   Prefer to rescale +inf to finite, and ignore final points with -inf.
-        #   Remove -inf's (0-weight), and correct indices
+    # Reweight -- account for large dynamic range!
+    #   Prefer to rescale +inf to finite, and ignore final points with -inf.
+    #   Remove -inf (0-weight), and correct indices
 
     difflogmax = max(mpi.allgather(difflogmax))
 

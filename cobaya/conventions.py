@@ -70,7 +70,7 @@ _separator_files = "."
 _weight = "weight"  # sample weight
 _minuslogpost = "minuslogpost"  # log-posterior, or in general the total log-probability
 _minuslogprior = "minuslogprior"  # log-prior
-_chi2 = "chi2"  # chi^2 = -2 * loglik
+_chi2 = "chi2"  # chi^2 = -2 * loglike
 _get_chi2_name = lambda p: _chi2 + _separator + str(p)
 _undo_chi2_name = lambda p: p[len(_chi2 + _separator):]
 _get_chi2_label = lambda p: r"\chi^2_\mathrm{" + str(p).replace("_", r"\ ") + r"}"

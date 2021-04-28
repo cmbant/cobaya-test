@@ -98,7 +98,7 @@ from cobaya.tools import read_dnumber, recursive_update
 from cobaya.sampler import CovmatSampler
 from cobaya import mpi
 
-# Handling scpiy vs BOBYQA
+# Handling scipy vs BOBYQA
 evals_attr = {"scipy": "fun", "bobyqa": "f"}
 
 # Conventions conventions

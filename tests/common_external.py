@@ -19,7 +19,7 @@ from cobaya.tools import getfullargspec
 from cobaya.likelihood import Likelihood
 from cobaya import mpi
 
-# Definition of external (log)pdf's
+# Definition of external (log)pdfs
 
 half_ring_str = "lambda x, y: stats.norm.logpdf(np.sqrt(x**2 + y**2), loc=0.5, scale=0.1)"
 half_ring_func = lambda x, y: eval(half_ring_str)(x, y)
@@ -93,7 +93,7 @@ def body_of_test(info_logpdf, kind, tmpdir, derived=False, manual=False):
     logps = {name: logpdf(**{arg: products["sample"][arg].values for arg in
                              getfullargspec(logpdf)[0]}) for name, logpdf in
              {"half_ring": half_ring_func, "gaussian_y": gaussian_func}.items()}
-    # Test #1: values of logpdf's
+    # Test #1: values of logpdfs
     if kind == _prior:
         columns_priors = [c for c in products["sample"].data.columns
                           if c.startswith("minuslogprior")]
