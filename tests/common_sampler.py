@@ -8,7 +8,7 @@ from scipy.stats import multivariate_normal
 from getdist.mcsamples import MCSamplesFromCobaya
 
 from cobaya.conventions import kinds, _output_prefix, empty_dict
-from cobaya.conventions import _debug, _debug_file, _packages_path, partag
+from cobaya.conventions import _debug, _debug_file, _packages_path
 from cobaya.likelihoods.gaussian_mixture import info_random_gaussian_mixture
 from cobaya.typing import InputDict
 from cobaya.tools import KL_norm
@@ -103,7 +103,7 @@ def body_of_test(dimension=1, n_modes=1, info_sampler=empty_dict, tmpdir="",
                 import getdist.plots as gdplots
                 from getdist.gaussian_mixtures import MixtureND
                 sampled_params = [
-                    p for p, v in info["params"].items() if partag.prior not in v]
+                    p for p, v in info["params"].items() if "prior" not in v]
                 mixture = MixtureND(
                     info[kinds.likelihood]["gaussian_mixture"]["means"],
                     info[kinds.likelihood]["gaussian_mixture"]["covs"],

@@ -16,7 +16,6 @@ PriorsDict = Dict[str, Union[str, callable]]
 if sys.version_info >= (3, 8):
 
     from typing import TypedDict
-    from numpy.typing import ArrayLike
 
 
     class SciPyDistDict(TypedDict):
@@ -37,12 +36,14 @@ if sys.version_info >= (3, 8):
         prior: Union[None, Tuple[float, float], SciPyDistDict, SciPyMinMaxDict]
         ref: Union[None, Tuple[float, float], SciPyDistDict, SciPyMinMaxDict]
         proposal: Optional[float]
-        renames: Sequence[str]
+        renames: Union[str, Sequence[str]]
         latex: str
         drop: bool  # true if parameter should not be available for assignment to theories
         min: float  # hard bounds (does not affect prior)
         max: float
 
+
+    partags = ParamDict.__optional_keys__
 
     ParamsDict = Dict[str, Union[None, ParamDict, float, Sequence[float]]]
 
@@ -78,13 +79,18 @@ if sys.version_info >= (3, 8):
         version: Optional[Union[str, InfoDict]]
 
 else:
-    ArrayLike = Union[Sequence, np.ndarray]
-
     InputDict = InfoDict
     ParamDict = InfoDict
     ModelDict = InfoDict
     PostDict = InfoDict
     ParamsDict = Dict[str, Union[None, ParamDict, float, Sequence[float]]]
+    partags = {"prior", "ref", "proposal", "value", "drop",
+               "derived", "latex", "renames", "min", "max"}
+
+try:
+    from numpy.typing import ArrayLike
+except ImportError:
+    ArrayLike = Union[Sequence, np.ndarray]
 
 OptionalArrayLike = Optional[ArrayLike]
 ArrayOrFloat = Union[float, ArrayLike]

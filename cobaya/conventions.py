@@ -46,9 +46,6 @@ _component_path = "python_path"
 _aliases = "aliases"
 _version = "version"
 
-partag = ("prior", "ref", "proposal", "value", "dist", "drop",
-          "derived", "latex", "renames", "min", "max")
-
 ComponentKinds = namedtuple('ComponentKinds', ("sampler", "theory", "likelihood"))
 kinds = ComponentKinds(*ComponentKinds._fields)
 

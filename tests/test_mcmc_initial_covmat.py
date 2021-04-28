@@ -9,7 +9,7 @@ from itertools import chain
 from random import shuffle
 
 from cobaya.likelihoods.gaussian_mixture import random_cov
-from cobaya.conventions import kinds, partag, _prior, _params
+from cobaya.conventions import kinds, _prior, _params
 from cobaya.typing import InputDict
 from cobaya.run import run
 from cobaya import mpi
@@ -61,8 +61,8 @@ def body_of_test(dim, tmpdir=None):
         if i in i_proposal:
             info[_params][p]["proposal"] = sigma
         elif i in i_ref:
-            info[_params][prefix + str(i)][partag.ref] = {"dist": "norm",
-                                                          "scale": sigma}
+            info[_params][prefix + str(i)]["ref"] = {"dist": "norm",
+                                                     "scale": sigma}
         elif i in i_prior:
             info[_params][prefix + str(i)][_prior]["scale"] = sigma
     reduced_covmat = initial_random_covmat[np.ix_(i_covmat, i_covmat)]

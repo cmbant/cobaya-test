@@ -15,8 +15,7 @@ from copy import deepcopy
 from typing import Mapping, Sequence, Union, Optional
 
 # Local
-from cobaya.typing import ParamsDict, ParamDict, ParamValuesDict
-from cobaya.conventions import partag
+from cobaya.typing import ParamsDict, ParamDict, ParamValuesDict, partags
 from cobaya.tools import get_external_function, ensure_nolatex, is_valid_variable_name, \
     getfullargspec, deepcopy_where_possible, invert_dict, str_to_list
 from cobaya.log import LoggedError, HasLogger
@@ -130,9 +129,9 @@ class Parameterization(HasLogger):
         # to infos without _prior or "value", and a "value" field
         # to fixed params
         for p, info in info_params.items():
-            if isinstance(info, Mapping) and set(info).difference(partag):
+            if isinstance(info, Mapping) and set(info).issubset(partags):
                 raise LoggedError(self.log, "Parameter '%s' has unknown options %s",
-                                  p, set(info).difference(partag))
+                                  p, set(info).difference(partags))
             info = expand_info_param(info)
             self._infos[p] = info
             if is_fixed_or_function_param(info):

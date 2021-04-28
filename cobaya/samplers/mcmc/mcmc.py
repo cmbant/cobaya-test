@@ -17,7 +17,7 @@ from copy import deepcopy
 # Local
 from cobaya import __version__
 from cobaya.sampler import CovmatSampler
-from cobaya.mpi import get_mpi_size, get_mpi_comm, get_mpi, share_mpi
+from cobaya.mpi import get_mpi_size, share_mpi
 from cobaya.mpi import more_than_one_process, is_main_process, sync_processes
 from cobaya.collection import Collection, OneSamplePoint
 from cobaya.conventions import kinds, _weight, _minuslogpost, _covmat_extension
@@ -698,7 +698,7 @@ class mcmc(CovmatSampler):
                 except:
                     bound = None
                     success_bounds = False
-                bounds = np.array(get_mpi_comm().gather(bound))
+                bounds = np.array(mpi.gather(bound))
             else:
                 try:
                     mcsamples_list = [

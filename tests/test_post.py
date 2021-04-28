@@ -11,7 +11,7 @@ from cobaya.post import post
 from cobaya.tools import KL_norm
 from cobaya.typing import ParamsDict, InputDict
 from cobaya.conventions import _output_prefix, _params, _force, kinds
-from cobaya.conventions import _prior, partag, _separator_files
+from cobaya.conventions import _prior, _separator_files
 from cobaya.conventions import _post, _post_add, _post_remove, _post_suffix
 from cobaya import mpi
 
