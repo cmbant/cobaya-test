@@ -42,7 +42,7 @@ if sys.version_info >= (3, 8):
         stats: ParamValuesDict
         weights: Union[np.ndarray, List[np.ndarray]]
 else:
-    ResultDict = InfoDict
+    PostResultDict = InfoDict
 
 _minuslogprior_1d_name = _minuslogprior + _separator + _prior_1d_name
 _default_post_cache_size = 2000

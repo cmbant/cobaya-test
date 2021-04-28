@@ -11,7 +11,7 @@
 from copy import deepcopy
 
 # Local
-from cobaya.conventions import kinds, partag as p, _params
+from cobaya.conventions import kinds, _params
 from cobaya.typing import InfoDict
 
 _camb = "camb"
@@ -32,17 +32,17 @@ primordial: InfoDict = dict([
         kinds.theory: {_camb: None, _classy: None},
         _params: dict([
             ["logA", dict([
-                (p.prior, dict([("min", 1.61), ("max", 3.91)])),
-                (p.ref, dict([("dist", "norm"), ("loc", 3.05), ("scale", 0.001)])),
-                (p.proposal, 0.001), (p.latex, r"\log(10^{10} A_\mathrm{s})"),
-                (p.drop, True)])],
+                ("prior", dict([("min", 1.61), ("max", 3.91)])),
+                ("ref", dict([("dist", "norm"), ("loc", 3.05), ("scale", 0.001)])),
+                ("proposal", 0.001), ("latex", r"\log(10^{10} A_\mathrm{s})"),
+                ("drop", True)])],
             ("As", dict([
-                (p.value, "lambda logA: 1e-10*np.exp(logA)"),
-                (p.latex, r"A_\mathrm{s}")])),
+                ("value", "lambda logA: 1e-10*np.exp(logA)"),
+                ("latex", r"A_\mathrm{s}")])),
             ("ns", dict([
-                (p.prior, dict([("min", 0.8), ("max", 1.2)])),
-                (p.ref, dict([("dist", "norm"), ("loc", 0.965), ("scale", 0.004)])),
-                (p.proposal, 0.002), (p.latex, r"n_\mathrm{s}")]))])})])
+                ("prior", dict([("min", 0.8), ("max", 1.2)])),
+                ("ref", dict([("dist", "norm"), ("loc", 0.965), ("scale", 0.004)])),
+                ("proposal", 0.002), ("latex", r"n_\mathrm{s}")]))])})])
 primordial.update(dict([
     ["SFSR_DESpriors", {
         _desc: "Adiabatic scalar perturbations, power law + running spectrum "
@@ -50,14 +50,14 @@ primordial.update(dict([
         kinds.theory: {_camb: None, _classy: None},
         _params: dict([
             ["As_1e9", dict([
-                [p.prior, dict([["min", 0.5], ["max", 5]])],
-                [p.ref,
+                ["prior", dict([["min", 0.5], ["max", 5]])],
+                ["ref",
                  dict([["dist", "norm"], ["loc", 2.1], ["scale", 0.5]])],
-                [p.proposal, 0.25], [p.latex, r"10^9 A_\mathrm{s})"],
-                [p.drop, True], [p.renames, "A"]])],
+                ["proposal", 0.25], ["latex", r"10^9 A_\mathrm{s})"],
+                ["drop", True], ["renames", "A"]])],
             ["As", dict([
-                [p.value, "lambda As_1e9: 1e-9 * As_1e9"],
-                [p.latex, r"A_\mathrm{s}"]])],
+                ["value", "lambda As_1e9: 1e-9 * As_1e9"],
+                ["latex", r"A_\mathrm{s}"]])],
             ["ns", primordial["SFSR"][_params]["ns"]]])}]]))
 primordial.update(dict([
     ["SFSR_run", {
@@ -66,10 +66,10 @@ primordial.update(dict([
         _params: dict(
             (list(primordial["SFSR"][_params].items()) +
              [["nrun", dict([
-                 [p.prior, dict([["min", -1], ["max", 1]])],
-                 [p.ref,
+                 ["prior", dict([["min", -1], ["max", 1]])],
+                 ["ref",
                   dict([["dist", "norm"], ["loc", 0], ["scale", 0.005]])],
-                 [p.proposal, 0.001], [p.latex, r"n_\mathrm{run}"]])]]))}]]))
+                 ["proposal", 0.001], ["latex", r"n_\mathrm{run}"]])]]))}]]))
 primordial.update(dict([
     ["SFSR_runrun", {
         _desc: "Adiabatic scalar perturbations, power law + 2nd-order running spectrum",
@@ -77,11 +77,11 @@ primordial.update(dict([
         _params: dict(
             (list(primordial["SFSR_run"][_params].items()) +
              [["nrunrun", dict([
-                 [p.prior, dict([["min", -1], ["max", 1]])],
-                 [p.ref,
+                 ["prior", dict([["min", -1], ["max", 1]])],
+                 ["ref",
                   dict([["dist", "norm"], ["loc", 0], ["scale", 0.002]])],
-                 [p.proposal, 0.001],
-                 [p.latex, r"n_\mathrm{run,run}"]])]]))}]]))
+                 ["proposal", 0.001],
+                 ["latex", r"n_\mathrm{run,run}"]])]]))}]]))
 primordial.update(dict([
     ["SFSR_t", {
         _desc: "Adiabatic scalar+tensor perturbations, "
@@ -91,10 +91,10 @@ primordial.update(dict([
         _params: dict(
             (list(primordial["SFSR"][_params].items()) +
              [["r", dict([
-                 [p.prior, dict([["min", 0], ["max", 3]])],
-                 [p.ref,
+                 ["prior", dict([["min", 0], ["max", 3]])],
+                 ["ref",
                   dict([["dist", "norm"], ["loc", 0], ["scale", 0.03]])],
-                 [p.proposal, 0.03], [p.latex, r"r_{0.05}"]])]]))}]]))
+                 ["proposal", 0.03], ["latex", r"r_{0.05}"]])]]))}]]))
 primordial.update(dict([
     ["SFSR_t_nrun", {
         _desc: "Adiabatic scalar+tensor perturbations, "
@@ -119,10 +119,10 @@ geometry: InfoDict = dict([
         kinds.theory: {_camb: None, _classy: None},
         _params: dict([
             ["omegak", dict([
-                [p.prior, dict([["min", -0.3], ["max", 0.3]])],
-                [p.ref,
+                ["prior", dict([["min", -0.3], ["max", 0.3]])],
+                ["ref",
                  dict([["dist", "norm"], ["loc", -0.009], ["scale", 0.001]])],
-                [p.proposal, 0.001], [p.latex, r"\Omega_k"]])]])}], ])
+                ["proposal", 0.001], ["latex", r"\Omega_k"]])]])}], ])
 
 # Hubble parameter constraints
 H0_min, H0_max = 20, 100
@@ -132,17 +132,17 @@ hubble: InfoDict = dict([
         kinds.theory: {_camb: None, _classy: None},
         _params: dict([
             ["H0", dict([
-                [p.prior, dict([["min", H0_min], ["max", H0_max]])],
-                [p.ref, dict([["dist", "norm"], ["loc", 67], ["scale", 2]])],
-                [p.proposal, 2], [p.latex, r"H_0"]])]])}],
+                ["prior", dict([["min", H0_min], ["max", H0_max]])],
+                ["ref", dict([["dist", "norm"], ["loc", 67], ["scale", 2]])],
+                ["proposal", 2], ["latex", r"H_0"]])]])}],
     ["H_DESpriors", {
         _desc: "Hubble parameter (reduced range for DES and lensing-only constraints)",
         kinds.theory: {_camb: None, _classy: None},
         _params: dict([
             ["H0", dict([
-                [p.prior, dict([["min", 55], ["max", 91]])],
-                [p.ref, dict([["dist", "norm"], ["loc", 67], ["scale", 2]])],
-                [p.proposal, 2], [p.latex, r"H_0"]])]])}],
+                ["prior", dict([["min", 55], ["max", 91]])],
+                ["ref", dict([["dist", "norm"], ["loc", 67], ["scale", 2]])],
+                ["proposal", 2], ["latex", r"H_0"]])]])}],
     ["sound_horizon_last_scattering", {
         _desc: "Angular size of the sound horizon at last scattering "
                "(approximate, if using CAMB)",
@@ -150,31 +150,31 @@ hubble: InfoDict = dict([
             _camb: {
                 _params: dict([
                     ["theta_MC_100", dict([
-                        [p.prior, dict([["min", 0.5], ["max", 10]])],
-                        [p.ref,
+                        ["prior", dict([["min", 0.5], ["max", 10]])],
+                        ["ref",
                          dict([["dist", "norm"], ["loc", 1.04109],
                                ["scale", 0.0004]])],
-                        [p.proposal, 0.0002],
-                        [p.latex, r"100\theta_\mathrm{MC}"],
-                        [p.drop, True], [p.renames, "theta"]])],
+                        ["proposal", 0.0002],
+                        ["latex", r"100\theta_\mathrm{MC}"],
+                        ["drop", True], ["renames", "theta"]])],
                     ["cosmomc_theta", dict([
-                        [p.value, "lambda theta_MC_100: 1.e-2*theta_MC_100"],
-                        [p.derived, False]])],
-                    ["H0", {p.latex: r"H_0", "min": H0_min, "max": H0_max}]]),
+                        ["value", "lambda theta_MC_100: 1.e-2*theta_MC_100"],
+                        ["derived", False]])],
+                    ["H0", {"latex": r"H_0", "min": H0_min, "max": H0_max}]]),
                 _extra_args: dict([["theta_H0_range", [H0_min, H0_max]]])},
             _classy: {
                 _params: dict([
                     ["theta_s_1e2", dict([
-                        [p.prior, dict([["min", 0.5], ["max", 10]])],
-                        [p.ref, dict([
+                        ["prior", dict([["min", 0.5], ["max", 10]])],
+                        ["ref", dict([
                             ["dist", "norm"], ["loc", 1.0416], ["scale", 0.0004]])],
-                        [p.proposal, 0.0002],
-                        [p.latex, r"100\theta_\mathrm{s}"],
-                        [p.drop, True]])],
+                        ["proposal", 0.0002],
+                        ["latex", r"100\theta_\mathrm{s}"],
+                        ["drop", True]])],
                     ["100*theta_s", dict([
-                        [p.value, "lambda theta_s_1e2: theta_s_1e2"],
-                        [p.derived, False]])],
-                    ["H0", {p.latex: r"H_0"}]])}}}]])
+                        ["value", "lambda theta_s_1e2: theta_s_1e2"],
+                        ["derived", False]])],
+                    ["H0", {"latex": r"H_0"}]])}}}]])
 
 # Matter sector (minus light species)
 N_eff_std = 3.046
@@ -185,45 +185,45 @@ matter: InfoDict = dict([
         kinds.theory: {_camb: None, _classy: None},
         _params: dict([
             ["omegabh2", dict([
-                [p.prior, dict([["min", 0.005], ["max", 0.1]])],
-                [p.ref,
+                ["prior", dict([["min", 0.005], ["max", 0.1]])],
+                ["ref",
                  dict([["dist", "norm"], ["loc", 0.0224], ["scale", 0.0001]])],
-                [p.proposal, 0.0001], [p.latex, r"\Omega_\mathrm{b} h^2"]])],
+                ["proposal", 0.0001], ["latex", r"\Omega_\mathrm{b} h^2"]])],
             ["omegach2", dict([
-                [p.prior, dict([["min", 0.001], ["max", 0.99]])],
-                [p.ref,
+                ["prior", dict([["min", 0.001], ["max", 0.99]])],
+                ["ref",
                  dict([["dist", "norm"], ["loc", 0.120], ["scale", 0.001]])],
-                [p.proposal, 0.0005], [p.latex, r"\Omega_\mathrm{c} h^2"]])],
-            ["omegam", {p.latex: r"\Omega_\mathrm{m}"}]])}],
+                ["proposal", 0.0005], ["latex", r"\Omega_\mathrm{c} h^2"]])],
+            ["omegam", {"latex": r"\Omega_\mathrm{m}"}]])}],
     ["Omegab, Omegam", {
         _desc: "Flat prior on Omega for baryons and total matter",
         kinds.theory: {_camb: None, _classy: None},
         _params: dict([
             ["omegab", dict([
-                [p.prior, dict([["min", 0.03], ["max", 0.07]])],
-                [p.ref,
+                ["prior", dict([["min", 0.03], ["max", 0.07]])],
+                ["ref",
                  dict([["dist", "norm"], ["loc", 0.0495], ["scale", 0.004]])],
-                [p.proposal, 0.004], [p.latex, r"\Omega_\mathrm{b}"],
-                [p.drop, True]])],
+                ["proposal", 0.004], ["latex", r"\Omega_\mathrm{b}"],
+                ["drop", True]])],
             ["omegam", dict([
-                [p.prior, dict([["min", 0.1], ["max", 0.9]])],
-                [p.ref,
+                ["prior", dict([["min", 0.1], ["max", 0.9]])],
+                ["ref",
                  dict([["dist", "norm"], ["loc", 0.316], ["scale", 0.02]])],
-                [p.proposal, 0.02], [p.latex, r"\Omega_\mathrm{m}"],
-                [p.drop, True]])],
+                ["proposal", 0.02], ["latex", r"\Omega_\mathrm{m}"],
+                ["drop", True]])],
             ["omegabh2", dict([
-                [p.value, "lambda omegab, H0: omegab*(H0/100)**2"],
-                [p.latex, r"\Omega_\mathrm{b} h^2"]])],
+                ["value", "lambda omegab, H0: omegab*(H0/100)**2"],
+                ["latex", r"\Omega_\mathrm{b} h^2"]])],
             ["omegach2", dict([
-                [p.value, ("lambda omegam, omegab, mnu, H0: "
+                ["value", ("lambda omegam, omegab, mnu, H0: "
                            "(omegam-omegab)*(H0/100)**2-(mnu*(%g/3)**0.75)/%g" % (
                                N_eff_std, nu_mass_fac))],
-                [p.latex, r"\Omega_\mathrm{c} h^2"]])]
+                ["latex", r"\Omega_\mathrm{c} h^2"]])]
         ])}]])
 for m in matter.values():
     m[_params]["omegamh2"] = dict([
-        [p.derived, "lambda omegam, H0: omegam*(H0/100)**2"],
-        [p.latex, r"\Omega_\mathrm{m} h^2"]])
+        ["derived", "lambda omegam, H0: omegam*(H0/100)**2"],
+        ["latex", r"\Omega_\mathrm{m} h^2"]])
 
 # Neutrinos and other extra matter
 neutrinos: InfoDict = dict([
@@ -234,27 +234,27 @@ neutrinos: InfoDict = dict([
                     _params: dict([["mnu", 0.06]])},
             _classy: {_extra_args: {"N_ncdm": 1, "N_ur": 2.0328},
                       _params: dict([
-                          ["m_ncdm", {p.value: 0.06, p.renames: "mnu"}]])}}}],
+                          ["m_ncdm", {"value": 0.06, "renames": "mnu"}]])}}}],
     ["varying_mnu", {
         _desc: "Varying total mass of 3 degenerate nu's, with N_eff=3.046",
         kinds.theory: {
             _camb: {_extra_args: {"num_massive_neutrinos": 3, "nnu": 3.046},
                     _params: dict([
                         ["mnu", dict([
-                            [p.prior, dict([["min", 0], ["max", 5]])],
-                            [p.ref, dict([
+                            ["prior", dict([["min", 0], ["max", 5]])],
+                            ["ref", dict([
                                 ["dist", "norm"], ["loc", 0.02], ["scale", 0.1]])],
-                            [p.proposal, 0.03], [p.latex, r"\sum m_\nu"]])]])},
+                            ["proposal", 0.03], ["latex", r"\sum m_\nu"]])]])},
             _classy: {_extra_args: {"N_ncdm": 1, "deg_ncdm": 3, "N_ur": 0.00641},
                       _params: dict([
                           ["m_ncdm", dict([
-                              [p.prior, dict([["min", 0], ["max", 1.667]])],
-                              [p.ref, dict([
+                              ["prior", dict([["min", 0], ["max", 1.667]])],
+                              ["ref", dict([
                                   ["dist", "norm"], ["loc", 0.0067],
                                   ["scale", 0.033]])],
-                              [p.proposal, 0.01], [p.latex, r"m_\nu"]])],
-                          ["mnu", dict([[p.derived, "lambda m_ncdm: 3 * m_ncdm"],
-                                        [p.latex, r"\sum m_\nu"]])]])}}}],
+                              ["proposal", 0.01], ["latex", r"m_\nu"]])],
+                          ["mnu", dict([["derived", "lambda m_ncdm: 3 * m_ncdm"],
+                                        ["latex", r"\sum m_\nu"]])]])}}}],
     ["varying_Neff", {
         _desc: "Varying Neff with two massless nu and one with m=0.06",
         kinds.theory: {
@@ -262,25 +262,25 @@ neutrinos: InfoDict = dict([
                     _params: dict([
                         ["mnu", 0.06],
                         ["nnu", dict([
-                            [p.prior, dict([["min", 0.05], ["max", 10]])],
-                            [p.ref, dict([
+                            ["prior", dict([["min", 0.05], ["max", 10]])],
+                            ["ref", dict([
                                 ["dist", "norm"], ["loc", 3.046], ["scale", 0.05]])],
-                            [p.proposal, 0.05],
-                            [p.latex, r"N_\mathrm{eff}"]])]])},
+                            ["proposal", 0.05],
+                            ["latex", r"N_\mathrm{eff}"]])]])},
             _classy: {_extra_args: {"N_ncdm": 1},
                       _params: dict([
                           ["m_ncdm",
-                           dict([[p.value, 0.06], [p.renames, "mnu"]])],
+                           dict([["value", 0.06], ["renames", "mnu"]])],
                           ["N_ur", dict([
-                              [p.prior, dict([["min", 0.0001], ["max", 9]])],
-                              [p.ref, dict([
+                              ["prior", dict([["min", 0.0001], ["max", 9]])],
+                              ["ref", dict([
                                   ["dist", "norm"], ["loc", 2.0328],
                                   ["scale", 0.05]])],
-                              [p.proposal, 0.05],
-                              [p.latex, r"N_\mathrm{ur}"]])],
+                              ["proposal", 0.05],
+                              ["latex", r"N_\mathrm{ur}"]])],
                           ["nnu", dict([
-                              [p.derived, "lambda Neff: Neff"],
-                              [p.latex, r"N_\mathrm{eff}"]])]])}}}]])
+                              ["derived", "lambda Neff: Neff"],
+                              ["latex", r"N_\mathrm{eff}"]])]])}}}]])
 neutrinos.update(dict([
     ["varying_mnu_Neff", {
         _desc: "Varying Neff and total mass of 3 degenerate nu's",
@@ -306,7 +306,7 @@ neutrinos.update(dict([
             #                        neutrinos["varying_Neff"][_theory]["classy"][_params]["nnu"])]
             #                ])}
         }}]]))
-# neutrinos["varying_mnu_Neff"][_theory][_classy][_params]["N_ur"][p.ref]["loc"] = 0.00641
+# neutrinos["varying_mnu_Neff"][_theory][_classy][_params]["N_ur"]["ref"]["loc"] = 0.00641
 
 #    # ["varying_Neff+1sterile", {
 #    #     _desc: "Varying Neff plus 1 sterile neutrino (SM nu's with m=0,0,0.06)",
@@ -316,14 +316,14 @@ neutrinos.update(dict([
 #    #             [["accuracy_level", 1.2]])}},
 #    #     _params: dict([
 #    #         ["nnu", dict([
-#    #             [p.prior, dict([["min", 3.046], ["max", 10]])],
-#    #             [p.ref, dict([["dist", "norm"], ["loc", 3.046], ["scale", 0.05]])],
-#    #             [p.proposal, 0.05], [p.latex, r"N_\mathrm{eff}"]])],
+#    #             ["prior", dict([["min", 3.046], ["max", 10]])],
+#    #             ["ref", dict([["dist", "norm"], ["loc", 3.046], ["scale", 0.05]])],
+#    #             ["proposal", 0.05], ["latex", r"N_\mathrm{eff}"]])],
 #    #         ["meffsterile", dict([
-#    #             [p.prior, dict([["min", 0], ["max", 3]])#,
-#    #             [p.ref, dict([["dist", "norm"], ["loc", 0.1], ["scale", 0.1]])],
-#    #             [p.proposal, 0.03],
-#    #             [p.latex, r"m_{\nu,\mathrm{sterile}}^\mathrm{eff}"]])]])}]
+#    #             ["prior", dict([["min", 0], ["max", 3]])#,
+#    #             ["ref", dict([["dist", "norm"], ["loc", 0.1], ["scale", 0.1]])],
+#    #             ["proposal", 0.03],
+#    #             ["latex", r"m_{\nu,\mathrm{sterile}}^\mathrm{eff}"]])]])}]
 
 # Dark Energy
 dark_energy: InfoDict = dict([
@@ -331,44 +331,44 @@ dark_energy: InfoDict = dict([
         _desc: "Cosmological constant (w=-1)",
         kinds.theory: {_camb: None, _classy: None},
         _params: dict([
-            ["omegal", {p.latex: r"\Omega_\Lambda"}]])}],
+            ["omegal", {"latex": r"\Omega_\Lambda"}]])}],
     ["de_w", {
         _desc: "Varying constant eq of state",
         kinds.theory: {_camb: None,
                        _classy: {_params: {"Omega_Lambda": 0}}},
         _params: dict([
             ["w", dict([
-                [p.prior, dict([["min", -3], ["max", -0.333]])],
-                [p.ref,
+                ["prior", dict([["min", -3], ["max", -0.333]])],
+                ["ref",
                  dict([["dist", "norm"], ["loc", -0.99], ["scale", 0.02]])],
-                [p.proposal, 0.02], [p.latex, r"w_\mathrm{DE}"]])]])}],
+                ["proposal", 0.02], ["latex", r"w_\mathrm{DE}"]])]])}],
     ["de_w_wa", {
         _desc: "Varying constant eq of state with w(a) = w0 + (1-a) wa",
         kinds.theory: {_camb: {_extra_args: {'dark_energy_model': 'ppf'}},
                        _classy: {_params: {"Omega_Lambda": 0}}},
         _params: dict([
             ["w", dict([
-                [p.prior, dict([["min", -3], ["max", 1]])],
-                [p.ref,
+                ["prior", dict([["min", -3], ["max", 1]])],
+                ["ref",
                  dict([["dist", "norm"], ["loc", -0.99], ["scale", 0.02]])],
-                [p.proposal, 0.02], [p.latex, r"w_{0,\mathrm{DE}}"]])],
+                ["proposal", 0.02], ["latex", r"w_{0,\mathrm{DE}}"]])],
             ["wa", dict([
-                [p.prior, dict([["min", -3], ["max", 2]])],
-                [p.ref, dict([["dist", "norm"], ["loc", 0], ["scale", 0.05]])],
-                [p.proposal, 0.05], [p.latex, r"w_{a,\mathrm{DE}}"]])]])}]])
+                ["prior", dict([["min", -3], ["max", 2]])],
+                ["ref", dict([["dist", "norm"], ["loc", 0], ["scale", 0.05]])],
+                ["proposal", 0.05], ["latex", r"w_{a,\mathrm{DE}}"]])]])}]])
 
 # BBN
 bbn_derived_camb: InfoDict = dict([
-    ["YpBBN", dict([[p.latex, r"Y_P^\mathrm{BBN}"]])],
-    ["DHBBN", dict([[p.derived, r"lambda DH: 10**5*DH"],
-                    [p.latex, r"10^5 \mathrm{D}/\mathrm{H}"]])]])
+    ["YpBBN", dict([["latex", r"Y_P^\mathrm{BBN}"]])],
+    ["DHBBN", dict([["derived", r"lambda DH: 10**5*DH"],
+                    ["latex", r"10^5 \mathrm{D}/\mathrm{H}"]])]])
 bbn = dict([
     ["consistency", {
         _desc: "Primordial Helium fraction inferred from BBN consistency",
         kinds.theory: {_camb: {_params: bbn_derived_camb},
                        _classy: None},
         _params: dict([
-            ["yheused", {p.latex: r"Y_\mathrm{P}"}]])}],
+            ["yheused", {"latex": r"Y_\mathrm{P}"}]])}],
     ["YHe_des_y1", {
         _desc: "Fixed Y_P = 0.245341 (used in DES Y1)",
         kinds.theory: {_camb: None,
@@ -381,10 +381,10 @@ bbn = dict([
                        _classy: None},
         _params: dict([
             ["yhe", dict([
-                [p.prior, dict([["min", 0.1], ["max", 0.5]])],
-                [p.ref,
+                ["prior", dict([["min", 0.1], ["max", 0.5]])],
+                ["ref",
                  dict([["dist", "norm"], ["loc", 0.237], ["scale", 0.006]])],
-                [p.proposal, 0.006], [p.latex, r"Y_\mathrm{P}"]])]])}], ])
+                ["proposal", 0.006], ["latex", r"Y_\mathrm{P}"]])]])}], ])
 
 # Reionization
 reionization: InfoDict = dict([
@@ -393,22 +393,22 @@ reionization: InfoDict = dict([
         kinds.theory: {_camb: None, _classy: None},
         _params: dict([
             ["tau", dict([
-                [p.prior, dict([["min", 0.01], ["max", 0.8]])],
-                [p.ref,
+                ["prior", dict([["min", 0.01], ["max", 0.8]])],
+                ["ref",
                  dict([["dist", "norm"], ["loc", 0.055], ["scale", 0.006]])],
-                [p.proposal, 0.003], [p.latex, r"\tau_\mathrm{reio}"]])],
-            ["zrei", {p.latex: r"z_\mathrm{re}"}]])}],
+                ["proposal", 0.003], ["latex", r"\tau_\mathrm{reio}"]])],
+            ["zrei", {"latex": r"z_\mathrm{re}"}]])}],
     ["gauss_prior", {
         _desc: "Standard reio, lasting delta_z=0.5, gaussian prior around tau=0.07",
         kinds.theory: {_camb: None, _classy: None},
         _params: dict([
             ["tau", dict([
-                [p.prior,
+                ["prior",
                  dict([["dist", "norm"], ["loc", 0.07], ["scale", 0.02]])],
-                [p.ref,
+                ["ref",
                  dict([["dist", "norm"], ["loc", 0.07], ["scale", 0.01]])],
-                [p.proposal, 0.005], [p.latex, r"\tau_\mathrm{reio}"]])],
-            ["zrei", {p.latex: r"z_\mathrm{re}"}]])}],
+                ["proposal", 0.005], ["latex", r"\tau_\mathrm{reio}"]])],
+            ["zrei", {"latex": r"z_\mathrm{re}"}]])}],
     ["irrelevant", {
         _desc: "Irrelevant (NB: only valid for non-CMB or CMB-marged datasets!)",
         kinds.theory: {_camb: None, _classy: None},
@@ -464,26 +464,26 @@ for name, m in like_cmb.items():
     if _params not in m:
         m[_params] = dict()
     m[_params].update(dict([
-        ["sigma8", {p.latex: r"\sigma_8"}],
+        ["sigma8", {"latex": r"\sigma_8"}],
         ["s8h5", dict([
-            [p.derived, "lambda sigma8, H0: sigma8*(H0*1e-2)**(-0.5)"],
-            [p.latex, r"\sigma_8/h^{0.5}"]])],
+            ["derived", "lambda sigma8, H0: sigma8*(H0*1e-2)**(-0.5)"],
+            ["latex", r"\sigma_8/h^{0.5}"]])],
         ["s8omegamp5", dict([
-            [p.derived, "lambda sigma8, omegam: sigma8*omegam**0.5"],
-            [p.latex, r"\sigma_8 \Omega_\mathrm{m}^{0.5}"]])],
+            ["derived", "lambda sigma8, omegam: sigma8*omegam**0.5"],
+            ["latex", r"\sigma_8 \Omega_\mathrm{m}^{0.5}"]])],
         ["s8omegamp25", dict([
-            [p.derived, "lambda sigma8, omegam: sigma8*omegam**0.25"],
-            [p.latex, r"\sigma_8 \Omega_\mathrm{m}^{0.25}"]])],
+            ["derived", "lambda sigma8, omegam: sigma8*omegam**0.25"],
+            ["latex", r"\sigma_8 \Omega_\mathrm{m}^{0.25}"]])],
         ["A", dict([
-            [p.derived, "lambda As: 1e9*As"],
-            [p.latex, r"10^9 A_\mathrm{s}"]])],
+            ["derived", "lambda As: 1e9*As"],
+            ["latex", r"10^9 A_\mathrm{s}"]])],
         ["clamp", dict([
-            [p.derived, "lambda As, tau: 1e9*As*np.exp(-2*tau)"],
-            [p.latex, r"10^9 A_\mathrm{s} e^{-2\tau}"]])],
+            ["derived", "lambda As, tau: 1e9*As*np.exp(-2*tau)"],
+            ["latex", r"10^9 A_\mathrm{s} e^{-2\tau}"]])],
         ["age", dict([
-            [p.latex, r"{\rm{Age}}/\mathrm{Gyr}"]])],
+            ["latex", r"{\rm{Age}}/\mathrm{Gyr}"]])],
         ["rdrag", dict([
-            [p.latex, r"r_\mathrm{drag}"]])]]))
+            ["latex", r"r_\mathrm{drag}"]])]]))
     if "cmbmarged" in name.lower():
         m[_params].pop("A")
         m[_params].pop("clamp")

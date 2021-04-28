@@ -41,9 +41,9 @@ target_pdf_prior = lambda a, b, c=0: target_pdf(a, b, c=0)[0]
 _range = {"min": -2, "max": 2}
 ref_pdf = {"dist": "norm", "loc": 0, "scale": 0.1}
 info_params: ParamsDict = dict([
-    ("a", {"prior": _range, "ref": ref_pdf, partag.proposal: sigma}),
-    ("b", {"prior": _range, "ref": ref_pdf, partag.proposal: sigma}),
-    ("a_plus_b", {partag.derived: lambda a, b: a + b})])
+    ("a", {"prior": _range, "ref": ref_pdf, "proposal": sigma}),
+    ("b", {"prior": _range, "ref": ref_pdf, "proposal": sigma}),
+    ("a_plus_b", {"derived": lambda a, b: a + b})])
 
 info_sampler = {"mcmc": {"Rminus1_stop": 0.005}}
 info_sampler_dummy = {"evaluate": {"N": 10}}
@@ -147,9 +147,9 @@ def test_post_params():
                         "target": {"external": target_pdf, "output_params": ["cprime"]}},
                     _params: {
                         "c": 1.234,
-                        "a_minus_b": {partag.derived: "lambda a,b: a-b"},
+                        "a_minus_b": {"derived": "lambda a,b: a-b"},
                         "my_chi2__target": {
-                            partag.derived: "lambda chi2__target: chi2__target"},
+                            "derived": "lambda chi2__target: chi2__target"},
                         "cprime": None}}}}
     info_post.update(updated_info_gaussian)
     products = post(info_post, products_gaussian["sample"]).products

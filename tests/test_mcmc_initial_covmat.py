@@ -59,7 +59,7 @@ def body_of_test(dim, tmpdir=None):
         info[_params][p] = {_prior: {"dist": "norm", "loc": 0, "scale": 1000}}
         sigma = np.sqrt(initial_random_covmat[i, i])
         if i in i_proposal:
-            info[_params][p][partag.proposal] = sigma
+            info[_params][p]["proposal"] = sigma
         elif i in i_ref:
             info[_params][prefix + str(i)][partag.ref] = {"dist": "norm",
                                                           "scale": sigma}
