@@ -129,7 +129,7 @@ class Parameterization(HasLogger):
         # to infos without _prior or "value", and a "value" field
         # to fixed params
         for p, info in info_params.items():
-            if isinstance(info, Mapping) and set(info).issubset(partags):
+            if isinstance(info, Mapping) and not set(info).issubset(partags):
                 raise LoggedError(self.log, "Parameter '%s' has unknown options %s",
                                   p, set(info).difference(partags))
             info = expand_info_param(info)

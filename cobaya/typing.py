@@ -43,7 +43,7 @@ if sys.version_info >= (3, 8):
         max: float
 
 
-    partags = ParamDict.__optional_keys__
+    partags = set(ParamDict.__annotations__)
 
     ParamsDict = Dict[str, Union[None, ParamDict, float, Sequence[float]]]
 
