@@ -227,6 +227,6 @@ def info_random_gaussian_mixture(
          for i in range(dimension)] +
         # derived
         ([[output_params_prefix + "_%d" % i,
-           {"min": -3, "max": 3, "latex": r"\beta_{%i}" % i}]
+           {"latex": r"\beta_{%i}" % i}]
           for i in range(dimension * n_modes)] if derived else []))
     return info
