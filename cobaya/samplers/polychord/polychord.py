@@ -327,6 +327,7 @@ class polychord(Sampler):
                         self.output.folder = self.clusters_folder
                     sample = self.save_sample(f, str(i))
                     if self.output:
+                        # noinspection PyUnboundLocalVariable
                         self.output.folder = old_folder
                     self.clusters[i] = {"sample": sample}
             # Prepare the evidence(s) and write to file
@@ -465,6 +466,7 @@ class polychord(Sampler):
         if path and not kwargs.get("allow_global"):
             if is_main_process():
                 log.info("Importing *local* PolyChord from '%s'.", path)
+            # noinspection PyTypeChecker
             if not os.path.exists(path):
                 if is_main_process():
                     log.error("The given folder does not exist: '%s'", path)

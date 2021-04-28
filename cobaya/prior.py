@@ -342,7 +342,8 @@ from types import MethodType
 from typing import Sequence, NamedTuple, Callable, Optional, Mapping
 
 # Local
-from cobaya.conventions import _prior, partag, _prior_1d_name, PriorsDict
+from cobaya.conventions import _prior, _prior_1d_name
+from cobaya.typing import PriorsDict
 from cobaya.tools import get_external_function, get_scipy_1d_pdf, read_dnumber
 from cobaya.tools import _fast_norm_logpdf, getfullargspec
 from cobaya.log import LoggedError, HasLogger
@@ -388,11 +389,11 @@ class Prior(HasLogger):
             if fast_logpdf:
                 self.pdf[-1].logpdf = MethodType(fast_logpdf, self.pdf[-1])
             # Get the reference (1d) pdf
-            ref = sampled_params_info[p].get(partag.ref)
+            ref = sampled_params_info[p].get("ref")
             # Cases: number, pdf (something, but not a number), nothing
             if isinstance(ref, Sequence) and len(ref) == 2 and all(
                     isinstance(n, numbers.Number) for n in ref):
-                ref = {partag.dist: "norm", "loc": ref[0], "scale": ref[1]}
+                ref = {"dist": "norm", "loc": ref[0], "scale": ref[1]}
             if isinstance(ref, numbers.Real):
                 self.ref_pdf += [float(ref)]
             elif isinstance(ref, Mapping):

@@ -22,11 +22,12 @@ import pkg_resources
 
 # Local
 from cobaya.conventions import _products_path, _packages_path, _resume, _force, _params, \
-    partag, _external, _output_prefix, _debug, _debug_file, _auto_params, _prior, \
+    _external, _output_prefix, _debug, _debug_file, _auto_params, _prior, \
     kinds, _provides, _requires, _input_params, _output_params, _component_path, \
     _aliases, _yaml_extensions, reserved_attributes, empty_dict, _get_chi2_name, \
-    _get_chi2_label, _test_run, _version, _class_name, _dill_extension, InputDict, \
+    _get_chi2_label, _test_run, _version, _class_name, _dill_extension, \
     _updated_suffix, _input_suffix, _post, _separator_files
+from cobaya.typing import InputDict
 from cobaya.tools import recursive_update, str_to_list, get_base_classes, \
     fuzzy_match, deepcopy_where_possible, get_resolved_class
 from cobaya.yaml import yaml_load_file, yaml_dump, yaml_load
@@ -47,11 +48,11 @@ def load_input_dict(info_or_yaml_or_file: Union[InputDict, str, os.PathLike]
             return yaml_load(info_or_yaml_or_file)
         else:
             return load_input_file(info_or_yaml_or_file)
-    else:
-        assert isinstance(info_or_yaml_or_file, Mapping), (
-            "The first argument must be a dictionary, file name or yaml string with the "
-            "required input options.")
+    elif isinstance(info_or_yaml_or_file, (dict, Mapping)):
         return deepcopy_where_possible(info_or_yaml_or_file)
+    else:
+        raise ValueError("The first argument must be a dictionary, file name or "
+                         "yaml string with the required input options.")
 
 
 def load_input_file(input_file: Union[str, os.PathLike],
@@ -225,7 +226,7 @@ def get_default_info(component_or_class, kind=None, return_yaml=False,
 def add_aggregated_chi2_params(param_info, all_types):
     for t in sorted(all_types):
         param_info[_get_chi2_name(t)] = {
-            partag.latex: _get_chi2_label(t), partag.derived: True}
+            "latex": _get_chi2_label(t), "derived": True}
 
 
 def update_info(info: InputDict) -> InputDict:
@@ -237,7 +238,7 @@ def update_info(info: InputDict) -> InputDict:
     # Don't modify the original input, and convert all Mapping to consistent dict
     input_info = deepcopy_where_possible(info)
     # Creates an equivalent info using only the defaults
-    updated_info = {}
+    updated_info: InputDict = {}
     default_params_info = {}
     default_prior_info = {}
     components = get_used_components(input_info)
@@ -291,14 +292,14 @@ def update_info(info: InputDict) -> InputDict:
             # Update default options with input info
             # Consistency is checked only up to first level! (i.e. subkeys may not match)
             # Reserved attributes not necessarily already in default info:
-            reserved = {_external, _class_name, _provides, _requires, partag.renames,
+            reserved = {_external, _class_name, _provides, _requires, "renames",
                         _input_params, _output_params, _component_path, _aliases}
             options_not_recognized = set(input_block[component]).difference(
                 chain(reserved, updated[component], annotations))
             if options_not_recognized:
                 alternatives = {}
                 available = (
-                    {_external, _class_name, _requires, partag.renames}.union(
+                    {_external, _class_name, _requires, "renames"}.union(
                         updated_info[block][component]))
                 while options_not_recognized:
                     option = options_not_recognized.pop()
@@ -341,7 +342,7 @@ def update_info(info: InputDict) -> InputDict:
     # Add aliases for theory params (after merging!)
     for kind in [k for k in [kinds.theory, kinds.likelihood] if k in updated_info]:
         for item in updated_info[kind].values():
-            renames = item.get(partag.renames)
+            renames = item.get("renames")
             if renames:
                 if not isinstance(renames, Mapping):
                     raise LoggedError(log,
@@ -354,9 +355,9 @@ def update_info(info: InputDict) -> InputDict:
                     if renames_pairs:
                         this_renames = reduce(
                             lambda x, y: x.union(y), [a for a in renames_flat if p in a])
-                        updated_info[_params][p][partag.renames] = \
+                        updated_info[_params][p]["renames"] = \
                             list(set(chain(this_renames, str_to_list(
-                                updated_info[_params][p].get(partag.renames, []))))
+                                updated_info[_params][p].get("renames", []))))
                                  .difference({p}))
     # Rest of the options
     for k, v in input_info.items():
@@ -406,11 +407,11 @@ def merge_params_info(params_infos, default_derived=True):
             new_info_p = expand_info_param(new_info_p)
             current_info[p].update(deepcopy(new_info_p))
             # Account for incompatibilities: "prior" and ("value" or "derived"+bounds)
-            incompatibilities = {_prior: [partag.value, partag.derived, "min", "max"],
-                                 partag.value: [partag.prior, partag.ref,
-                                                partag.proposal],
-                                 partag.derived: [partag.prior, partag.drop, partag.ref,
-                                                  partag.proposal]}
+            incompatibilities = {_prior: ["value", "derived", "min", "max"],
+                                 "value": ["prior", "ref",
+                                           "proposal"],
+                                 "derived": ["prior", "drop", "ref",
+                                             "proposal"]}
             for f1, incomp in incompatibilities.items():
                 if f1 in new_info_p:
                     for f2 in incomp:
@@ -494,18 +495,18 @@ def is_equal_info(info_old, info_new, strict=True, print_not_log=False, ignore_b
                     # Unify notation
                     block1[param] = expand_info_param(block1[param])
                     block2[param] = expand_info_param(block2[param])
-                    ignore_k.update({partag.latex, partag.renames, partag.ref,
-                                     partag.proposal, "min", "max"})
+                    ignore_k.update({"latex", "renames", "ref",
+                                     "proposal", "min", "max"})
                     # Fixed params, it doesn't matter if they are saved as derived
-                    if partag.value in block1[param]:
-                        block1[param].pop(partag.derived, None)
-                    if partag.value in block2[param]:
-                        block2[param].pop(partag.derived, None)
+                    if "value" in block1[param]:
+                        block1[param].pop("derived", None)
+                    if "value" in block2[param]:
+                        block2[param].pop("derived", None)
                     # Renames: order does not matter
-                    block1[param][partag.renames] = set(
-                        block1[param].get(partag.renames, []))
-                    block2[param][partag.renames] = set(
-                        block2[param].get(partag.renames, []))
+                    block1[param]["renames"] = set(
+                        block1[param].get("renames", []))
+                    block2[param]["renames"] = set(
+                        block2[param].get("renames", []))
         # 3. Now check component/parameters one-by-one
         for k in block1:
             if not strict:

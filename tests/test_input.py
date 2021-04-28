@@ -6,7 +6,8 @@ import pytest
 import os
 
 # Local
-from cobaya.conventions import kinds, partag, _prior, _params, InputDict
+from cobaya.conventions import kinds, partag, _prior, _params
+from cobaya.typing import InputDict
 from cobaya.run import run, run_script
 from cobaya.log import LoggedError
 from cobaya.input import get_default_info

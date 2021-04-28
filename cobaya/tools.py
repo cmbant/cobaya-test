@@ -20,7 +20,7 @@ from importlib import import_module
 from copy import deepcopy
 from packaging import version
 from itertools import permutations
-from typing import Mapping, Sequence, Any, List
+from typing import Mapping, Sequence, Any, List, TypeVar
 from numbers import Number
 from types import ModuleType
 from inspect import cleandoc, getfullargspec
@@ -34,7 +34,7 @@ with warnings.catch_warnings():
 
 # Local
 from cobaya import __obsolete__
-from cobaya.conventions import _cobaya_package, subfolders, partag, kinds, _packages_path, \
+from cobaya.conventions import _cobaya_package, subfolders, kinds, _packages_path, \
     _packages_path_config_file, _packages_path_env, _packages_path_arg, \
     _dump_sort_cosmetic
 from cobaya.log import LoggedError
@@ -344,7 +344,7 @@ def get_external_function(string_or_function, name=None):
     Returns the function.
     """
     if isinstance(string_or_function, Mapping):
-        string_or_function = string_or_function.get(partag.value)
+        string_or_function = string_or_function.get("value")
     if isinstance(string_or_function, str):
         try:
             scope = globals()
@@ -555,7 +555,7 @@ def get_scipy_1d_pdf(info):
                                "Check documentation for prior specification.")
     # What distribution?
     try:
-        dist = info2.pop(partag.dist).lower()
+        dist = info2.pop("dist").lower()
     # Not specified: uniform by default
     except KeyError:
         dist = "uniform"
@@ -742,7 +742,10 @@ def has_non_yaml_reproducible(info):
     return False
 
 
-def deepcopy_where_possible(base):
+_R = TypeVar('_R')
+
+
+def deepcopy_where_possible(base: _R) -> _R:
     """
     Deepcopies an object whenever possible. If the object cannot be copied, returns a
     reference to the original object (this applies recursively to keys and values of
@@ -858,7 +861,7 @@ def get_translated_params(params_info, params_list):
     """
     translations = {}
     for p, pinfo in params_info.items():
-        renames = {p}.union(str_to_list(pinfo.get(partag.renames, [])))
+        renames = {p}.union(str_to_list(pinfo.get("renames", [])))
         try:
             trans = next(r for r in renames if r in params_list)
             translations[p] = trans

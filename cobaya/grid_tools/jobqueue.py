@@ -54,6 +54,9 @@ def checkArguments(**kwargs):
 
 
 class jobSettings:
+    names: list
+    jobId: str
+
     def __init__(self, jobName, msg=False, **kwargs):
         self.jobName = jobName
         grid_engine = 'PBS'
@@ -350,7 +353,7 @@ def submitJob(jobName, inputFiles, sequential=False, msg=False, **kwargs):
             else:
                 j.inputFiles = inputFiles
                 if 'Your job ' in res:
-                    m = re.search('Your job (\d*) ', res)
+                    m = re.search(r'Your job (\d*) ', res)
                     res = m.group(1)
                 j.jobId = res
                 j.subTime = time.time()

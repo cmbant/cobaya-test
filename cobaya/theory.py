@@ -35,7 +35,8 @@ from collections import deque
 from typing import Sequence, Optional, Union, Tuple, Dict, Iterable
 # Local
 from cobaya.conventions import _external, kinds, _requires, _params, empty_dict, \
-    _class_name, TheoryDict, TheoriesDict, InfoDict, ParamValuesDict
+    _class_name
+from cobaya.typing import TheoryDict, TheoriesDict, InfoDict, ParamValuesDict
 from cobaya.component import CobayaComponent, ComponentCollection
 from cobaya.tools import get_resolved_class, str_to_list
 from cobaya.log import LoggedError, always_stop_exceptions

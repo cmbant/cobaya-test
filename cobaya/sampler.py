@@ -51,9 +51,10 @@ from typing import Optional, Sequence, Mapping, Union, Any
 from itertools import chain
 
 # Local
-from cobaya.conventions import kinds, _checkpoint_extension, _version, InfoDict
-from cobaya.conventions import _progress_extension, _covmat_extension, SamplersDict
-from cobaya.conventions import partag, _packages_path, _force, _resume, _output_prefix
+from cobaya.conventions import kinds, _checkpoint_extension, _version
+from cobaya.conventions import _progress_extension, _covmat_extension
+from cobaya.conventions import _packages_path, _force, _resume, _output_prefix
+from cobaya.typing import InfoDict, SamplersDict
 from cobaya.tools import get_class, deepcopy_where_possible, find_with_regexp
 from cobaya.tools import recursive_update, str_to_list
 from cobaya.model import Model
@@ -141,7 +142,8 @@ def get_sampler(info_sampler: SamplersDict, model: Model, output: Optional[Outpu
         output = OutputDummy()
     # Check and update info
     check_sane_info_sampler(info_sampler)
-    updated_info_sampler = update_info({kinds.sampler: info_sampler})[kinds.sampler]
+    updated_info_sampler = update_info(
+        {"sampler": info_sampler})[kinds.sampler]
     if logging.root.getEffectiveLevel() <= logging.DEBUG:
         logger_sampler.debug(
             "Input info updated with defaults (dumped to YAML):\n%s",
@@ -533,7 +535,7 @@ class CovmatSampler(Sampler):
                     self.log, "The covariance matrix %s is not a positive-definite, "
                               "symmetric square matrix.", str_msg)
             # Fill with parameters in the loaded covmat
-            renames = {p: [p] + str_to_list(v.get(partag.renames) or [])
+            renames = {p: [p] + str_to_list(v.get("renames") or [])
                        for p, v in params_infos.items()}
             indices_used, indices_sampler = zip(*[
                 [loaded_params.index(p),
@@ -573,7 +575,7 @@ class CovmatSampler(Sampler):
         where_nan = np.isnan(covmat.diagonal())
         if np.any(where_nan):
             covmat[where_nan, where_nan] = np.array(
-                [(info.get(partag.proposal, np.nan) or np.nan) ** 2
+                [(info.get("proposal", np.nan) or np.nan) ** 2
                  for info in params_infos.values()])[where_nan]
         where_nan2 = np.isnan(covmat.diagonal())
         if np.any(where_nan2):

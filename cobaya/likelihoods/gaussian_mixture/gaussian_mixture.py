@@ -14,8 +14,9 @@ from scipy.special import logsumexp
 from cobaya.likelihood import Likelihood
 from cobaya.log import LoggedError
 from cobaya.mpi import share_mpi, is_main_process
-from cobaya.conventions import kinds, _params, ArrayLike, ArrayOrFloat
+from cobaya.conventions import kinds, _params
 from cobaya.conventions import _input_params_prefix, _output_params_prefix
+from cobaya.typing import ArrayLike, ArrayOrFloat, InputDict
 
 derived_suffix = "_derived"
 
@@ -215,7 +216,7 @@ def info_random_gaussian_mixture(
     if mpi_aware:
         mean, cov = share_mpi((mean, cov))
     dimension = len(ranges)
-    info = {kinds.likelihood: {"gaussian_mixture": {
+    info: InputDict = {kinds.likelihood: {"gaussian_mixture": {
         "means": mean, "covs": cov, _input_params_prefix: input_params_prefix,
         _output_params_prefix: output_params_prefix, "derived": derived}}}
     info[_params] = dict(

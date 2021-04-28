@@ -7,9 +7,10 @@ import os
 from scipy.stats import multivariate_normal
 from getdist.mcsamples import MCSamplesFromCobaya
 
-from cobaya.conventions import kinds, _output_prefix, empty_dict, InputDict
+from cobaya.conventions import kinds, _output_prefix, empty_dict
 from cobaya.conventions import _debug, _debug_file, _packages_path, partag
 from cobaya.likelihoods.gaussian_mixture import info_random_gaussian_mixture
+from cobaya.typing import InputDict
 from cobaya.tools import KL_norm
 from cobaya.run import run
 from .common import process_packages_path, is_travis

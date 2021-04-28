@@ -8,7 +8,7 @@ import re
 from typing import Optional, List
 
 # Local
-from cobaya.conventions import _covmats_file, _aliases, _packages_path, partag, _params
+from cobaya.conventions import _covmats_file, _aliases, _packages_path, _params
 from cobaya.conventions import kinds, _covmat_extension
 from cobaya.tools import str_to_list, get_translated_params, get_cache_path
 from cobaya.parameterization import is_sampled_param
@@ -112,7 +112,7 @@ def _get_best_covmat(packages_path, params_info, likelihoods_info,
     _loaded_covmats_database = covmats_database
     # Prepare params and likes aliases
     params_renames = set(chain(*[
-        [p] + str_to_list(info.get(partag.renames, [])) for p, info in
+        [p] + str_to_list(info.get("renames", [])) for p, info in
         params_info.items()]))
     likes_renames = set(chain(*[[like] + str_to_list((info or {}).get(_aliases, []))
                                 for like, info in likelihoods_info.items()]))

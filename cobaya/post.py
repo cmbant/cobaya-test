@@ -20,9 +20,9 @@ from cobaya.parameterization import is_fixed_or_function_param, is_sampled_param
     is_derived_param
 from cobaya.conventions import _prior_1d_name, _debug, _debug_file, _output_prefix, \
     _post, _params, _prior, kinds, _weight, _resume, _separator, _get_chi2_name, \
-    _minuslogpost, _force, partag, _minuslogprior, _packages_path, \
+    _minuslogpost, _force, _minuslogprior, _packages_path, \
     _separator_files, _post_add, _post_remove, _post_suffix, _undo_chi2_name
-from cobaya.conventions import ParamValuesDict, InputDict, InfoDict
+from cobaya.typing import ParamValuesDict, InputDict, InfoDict
 from cobaya.collection import Collection
 from cobaya.log import logger_setup, LoggedError
 from cobaya.input import update_info, add_aggregated_chi2_params, load_input_dict
@@ -37,7 +37,7 @@ if sys.version_info >= (3, 8):
     from typing import TypedDict
 
 
-    class ResultDict(TypedDict):
+    class PostResultDict(TypedDict):
         sample: Union[Collection, List[Collection]]
         stats: ParamValuesDict
         weights: Union[np.ndarray, List[np.ndarray]]
@@ -50,7 +50,7 @@ _default_post_cache_size = 2000
 
 class PostTuple(NamedTuple):
     info: InputDict
-    products: ResultDict
+    products: PostResultDict
 
 
 def value_or_list(lst: list):
@@ -94,10 +94,9 @@ def post(info_or_yaml_or_file: Union[InputDict, str, os.PathLike],
                                "main block not under 'post'). ")
     # 1. Load existing sample
     output_in = get_output(prefix=info.get(_output_prefix))
+    info_in: InputDict
     if output_in:
-        info_in = output_in.load_updated_info()
-        if info_in is None:
-            info_in = update_info(info)
+        info_in = output_in.load_updated_info() or update_info(info)
     else:
         info_in = update_info(info)
     dummy_model_in = DummyModel(info_in[_params], info_in.get(kinds.likelihood, {}),
@@ -172,7 +171,7 @@ def post(info_or_yaml_or_file: Union[InputDict, str, os.PathLike],
             add[_params].pop(p)
 
     # 2.1 Adding/removing derived parameters and changes in priors of sampled parameters
-    out_combined = {_params: deepcopy_where_possible(info_in[_params])}
+    out_combined: InputDict = {"params": deepcopy_where_possible(info_in["params"])}
     remove_params = list(str_to_list(remove.get(_params)) or [])
     for p in remove_params:
         pinfo = info_in[_params].get(p)
@@ -215,7 +214,7 @@ def post(info_or_yaml_or_file: Union[InputDict, str, os.PathLike],
             # Only one possibility left "fixed" parameter that was not present before:
             # input of new likelihood, or just an argument for dynamical derived (dropped)
             if ((p in info_in[_params] and
-                 pinfo[partag.value] != (pinfo_in or {}).get(partag.value, None))):
+                 pinfo["value"] != (pinfo_in or {}).get("value", None))):
                 raise LoggedError(
                     log,
                     "You tried to add a fixed parameter '%s: %r' that was already present"
@@ -236,9 +235,9 @@ def post(info_or_yaml_or_file: Union[InputDict, str, os.PathLike],
     out_params_with_computed = deepcopy_where_possible(out_combined[_params])
     dropped_theory = set()
     for p, pinfo in out_params_with_computed.items():
-        if (is_derived_param(pinfo) and not (partag.value in pinfo)
+        if (is_derived_param(pinfo) and not ("value" in pinfo)
                 and p not in add.get(_params, {})):
-            out_params_with_computed[p] = {partag.value: np.nan}
+            out_params_with_computed[p] = {"value": np.nan}
             dropped_theory.add(p)
     # 2.2 Manage adding/removing priors and likelihoods
     warn_remove = False
@@ -300,13 +299,13 @@ def post(info_or_yaml_or_file: Union[InputDict, str, os.PathLike],
     add_aggregated_chi2_params(out_combined[_params], types)
 
     # 3. Create output collection
-    if _post_suffix not in info_post:
-        raise LoggedError(log, "You need to provide a '%s' for your output chains.",
-                          _post_suffix)
     # Use default prefix if it exists. If it does not, produce no output by default.
     # {post: {output: None}} suppresses output, and if it's a string, updates it.
     out_prefix = info_post.get(_output_prefix, info.get(_output_prefix))
     if out_prefix not in [None, False]:
+        if _post_suffix not in info_post:
+            raise LoggedError(log, "You need to provide a '%s' for your output chains.",
+                              _post_suffix)
         out_prefix += _separator_files + _post + _separator_files + info_post[
             _post_suffix]
     output_out = get_output(prefix=out_prefix, force=info.get(_force))
@@ -517,12 +516,12 @@ def post(info_or_yaml_or_file: Union[InputDict, str, os.PathLike],
         log.info(
             "Effective number of weighted samples if independent (sum w)^2/sum(w^2): "
             "%s", int(sum(tot_weight) ** 2 / sum(sum_w2)))
-    products = {"sample": value_or_list(out_collections),
-                "stats": {'min_weight': min(min_weight),
-                          'points_removed': sum(points_removed),
-                          'tot_weight': sum(tot_weight),
-                          'max_weight': max(max_weight),
-                          'sum_w2': sum(sum_w2),
-                          'points': sum(points)},
-                "weights": value_or_list(weights)}
+    products: PostResultDict = {"sample": value_or_list(out_collections),
+                                "stats": {'min_weight': min(min_weight),
+                                          'points_removed': sum(points_removed),
+                                          'tot_weight': sum(tot_weight),
+                                          'max_weight': max(max_weight),
+                                          'sum_w2': sum(sum_w2),
+                                          'points': sum(points)},
+                                "weights": value_or_list(weights)}
     return PostTuple(info=out_combined, products=products)

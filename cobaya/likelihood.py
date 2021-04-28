@@ -33,7 +33,7 @@ import numbers
 # Local
 from cobaya.conventions import kinds, _external, _component_path, empty_dict, \
     _input_params, _output_params, _requires, _class_name
-from cobaya.conventions import LikesDict, LikeDict
+from cobaya.typing import LikesDict, LikeDict
 from cobaya.tools import get_resolved_class, get_external_function, getfullargspec, \
     str_to_list
 from cobaya.log import LoggedError

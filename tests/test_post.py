@@ -9,7 +9,8 @@ import pytest
 from cobaya.run import run
 from cobaya.post import post
 from cobaya.tools import KL_norm
-from cobaya.conventions import _output_prefix, _params, _force, kinds, InfoDict
+from cobaya.typing import ParamsDict, InputDict
+from cobaya.conventions import _output_prefix, _params, _force, kinds
 from cobaya.conventions import _prior, partag, _separator_files
 from cobaya.conventions import _post, _post_add, _post_remove, _post_suffix
 from cobaya import mpi
@@ -38,8 +39,8 @@ def target_pdf(a, b, c=0):
 target_pdf_prior = lambda a, b, c=0: target_pdf(a, b, c=0)[0]
 
 _range = {"min": -2, "max": 2}
-ref_pdf = {partag.dist: "norm", "loc": 0, "scale": 0.1}
-info_params: InfoDict = dict([
+ref_pdf = {"dist": "norm", "loc": 0, "scale": 0.1}
+info_params: ParamsDict = dict([
     ("a", {"prior": _range, "ref": ref_pdf, partag.proposal: sigma}),
     ("b", {"prior": _range, "ref": ref_pdf, partag.proposal: sigma}),
     ("a_plus_b", {partag.derived: lambda a, b: a + b})])
@@ -52,11 +53,11 @@ info_sampler_dummy = {"evaluate": {"N": 10}}
 @mpi.sync_errors
 def test_post_prior(tmpdir):
     # Generate original chain
-    info = {
+    info: InputDict = {
         _output_prefix: os.path.join(tmpdir, "gaussian"), _force: True,
         _params: info_params, kinds.sampler: info_sampler,
         kinds.likelihood: {"one": None}, _prior: {"gaussian": sampled_pdf}}
-    info_post = {
+    info_post: InputDict = {
         _output_prefix: info[_output_prefix], _force: True,
         _post: {_post_suffix: "foo", 'skip': 0.05,
                 _post_remove: {_prior: {"gaussian": None}},

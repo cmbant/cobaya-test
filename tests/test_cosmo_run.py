@@ -7,7 +7,8 @@ from cobaya.theory import Theory
 from cobaya.run import run
 from cobaya import mpi
 from cobaya.log import LoggedError
-from cobaya.conventions import _packages_path, InfoDict, _dill_extension
+from cobaya.conventions import _packages_path, _dill_extension
+from cobaya.typing import InputDict, PostDict
 from cobaya.tools import deepcopy_where_possible
 from cobaya.cosmo_input.convert_cosmomc import cosmomc_root_to_cobaya_info_dict
 from .common import process_packages_path
@@ -41,7 +42,7 @@ class CTheory(Theory):
     params = {'AsX': None, 'As1000': {'derived': True}}
 
 
-info: InfoDict = {"params": {
+info: InputDict = {"params": {
     "ombh2": 0.0245,
     "H0": 70,
     "ns": 0.965,
@@ -108,12 +109,12 @@ def test_cosmo_run_resume_post(tmpdir, packages_path=None):
     assert abs(samp.mean('sigma8') - 0.69) < 0.02
 
     # post-processing
-    info_post = {'add': {'params': {'h': None},
-                         "likelihood": {"test_likelihood2": likelihood2}},
-                 'remove': {'likelihood': ["test_likelihood"]},
-                 'suffix': 'testpost',
-                 'skip': 0.2, 'thin': 4
-                 }
+    info_post: PostDict = {'add': {'params': {'h': None},
+                                   "likelihood": {"test_likelihood2": likelihood2}},
+                           'remove': {'likelihood': ["test_likelihood"]},
+                           'suffix': 'testpost',
+                           'skip': 0.2, 'thin': 4
+                           }
 
     output_info, products = run(updated_info, override={'post': info_post}, force=True)
     results2 = mpi.allgather(products["sample"])

@@ -4,7 +4,7 @@ from typing import MutableMapping, Mapping
 
 # Local
 from cobaya.input import get_default_info, merge_info
-from cobaya.conventions import kinds, partag, _params
+from cobaya.conventions import kinds, _params
 from cobaya.parameterization import reduce_info_param
 from . import input_database
 
@@ -12,7 +12,7 @@ from . import input_database
 def translate(p, info=None, dictionary=None):
     dictionary = dictionary or {}
     # Ignore if dropped
-    if not (info if isinstance(info, Mapping) else {}).get(partag.drop, False):
+    if not (info if isinstance(info, Mapping) else {}).get("drop", False):
         p = dictionary.get(p, p)
     # Try to modify lambda parameters too!
     if isinstance(info, str):
@@ -24,13 +24,13 @@ def translate(p, info=None, dictionary=None):
             arguments_t = [translate(pi, dictionary=dictionary)[0] for pi in arguments]
             for pi, pit in zip(arguments, arguments_t):
                 info = info.replace(pi, pit)
-    if ((isinstance(info, MutableMapping) and partag.derived in info and
-         isinstance(info[partag.derived], str))):
-        info[partag.derived] = translate(p, info[partag.derived],
-                                         dictionary=dictionary)[1]
-    elif (isinstance(info, MutableMapping) and partag.value in info and
-          isinstance(info[partag.value], str)):
-        info[partag.value] = translate(p, info[partag.value], dictionary=dictionary)[1]
+    if ((isinstance(info, MutableMapping) and "derived" in info and
+         isinstance(info["derived"], str))):
+        info["derived"] = translate(p, info["derived"],
+                                    dictionary=dictionary)[1]
+    elif (isinstance(info, MutableMapping) and "value" in info and
+          isinstance(info["value"], str)):
+        info["value"] = translate(p, info["value"], dictionary=dictionary)[1]
     return p, info
 
 
@@ -82,7 +82,7 @@ def create_input(**kwargs):
             remove_derived = []
             for p in info[_params]:
                 if any((p in info_part[_params])
-                        for info_part in list(infos.values())[:i]):
+                       for info_part in list(infos.values())[:i]):
                     remove_derived += [p]
             for p in remove_derived:
                 info[_params].pop(p)
@@ -110,7 +110,7 @@ def create_input(**kwargs):
         merged[_params][p] = reduce_info_param(info)
     # Translate from Planck param names
     planck_to_theo = \
-        get_default_info(theory_requested, kinds.theory)[partag.renames]
+        get_default_info(theory_requested, kinds.theory)["renames"]
     if kwargs.get("planck_names", False):
         merged[kinds.theory][theory_requested] = merged[kinds.theory][
                                                      theory_requested] or {}

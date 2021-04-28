@@ -15,7 +15,8 @@ import os
 from cobaya import __version__
 from cobaya.conventions import kinds, _prior, _params, _packages_path, _output_prefix, \
     _debug, _debug_file, _resume, _timing, _force, _post, _test_run, _packages_path_arg, \
-    _packages_path_arg_posix, InputDict
+    _packages_path_arg_posix
+from cobaya.typing import InputDict
 from cobaya.output import get_output
 from cobaya.model import Model
 from cobaya.sampler import get_sampler_name_and_class, check_sampler_info, Sampler

@@ -11,7 +11,8 @@
 from copy import deepcopy
 
 # Local
-from cobaya.conventions import kinds, partag as p, _params, InfoDict
+from cobaya.conventions import kinds, partag as p, _params
+from cobaya.typing import InfoDict
 
 _camb = "camb"
 _classy = "classy"
@@ -32,7 +33,7 @@ primordial: InfoDict = dict([
         _params: dict([
             ["logA", dict([
                 (p.prior, dict([("min", 1.61), ("max", 3.91)])),
-                (p.ref, dict([(p.dist, "norm"), ("loc", 3.05), ("scale", 0.001)])),
+                (p.ref, dict([("dist", "norm"), ("loc", 3.05), ("scale", 0.001)])),
                 (p.proposal, 0.001), (p.latex, r"\log(10^{10} A_\mathrm{s})"),
                 (p.drop, True)])],
             ("As", dict([
@@ -40,7 +41,7 @@ primordial: InfoDict = dict([
                 (p.latex, r"A_\mathrm{s}")])),
             ("ns", dict([
                 (p.prior, dict([("min", 0.8), ("max", 1.2)])),
-                (p.ref, dict([(p.dist, "norm"), ("loc", 0.965), ("scale", 0.004)])),
+                (p.ref, dict([("dist", "norm"), ("loc", 0.965), ("scale", 0.004)])),
                 (p.proposal, 0.002), (p.latex, r"n_\mathrm{s}")]))])})])
 primordial.update(dict([
     ["SFSR_DESpriors", {
@@ -51,7 +52,7 @@ primordial.update(dict([
             ["As_1e9", dict([
                 [p.prior, dict([["min", 0.5], ["max", 5]])],
                 [p.ref,
-                 dict([[p.dist, "norm"], ["loc", 2.1], ["scale", 0.5]])],
+                 dict([["dist", "norm"], ["loc", 2.1], ["scale", 0.5]])],
                 [p.proposal, 0.25], [p.latex, r"10^9 A_\mathrm{s})"],
                 [p.drop, True], [p.renames, "A"]])],
             ["As", dict([
@@ -67,7 +68,7 @@ primordial.update(dict([
              [["nrun", dict([
                  [p.prior, dict([["min", -1], ["max", 1]])],
                  [p.ref,
-                  dict([[p.dist, "norm"], ["loc", 0], ["scale", 0.005]])],
+                  dict([["dist", "norm"], ["loc", 0], ["scale", 0.005]])],
                  [p.proposal, 0.001], [p.latex, r"n_\mathrm{run}"]])]]))}]]))
 primordial.update(dict([
     ["SFSR_runrun", {
@@ -78,7 +79,7 @@ primordial.update(dict([
              [["nrunrun", dict([
                  [p.prior, dict([["min", -1], ["max", 1]])],
                  [p.ref,
-                  dict([[p.dist, "norm"], ["loc", 0], ["scale", 0.002]])],
+                  dict([["dist", "norm"], ["loc", 0], ["scale", 0.002]])],
                  [p.proposal, 0.001],
                  [p.latex, r"n_\mathrm{run,run}"]])]]))}]]))
 primordial.update(dict([
@@ -92,7 +93,7 @@ primordial.update(dict([
              [["r", dict([
                  [p.prior, dict([["min", 0], ["max", 3]])],
                  [p.ref,
-                  dict([[p.dist, "norm"], ["loc", 0], ["scale", 0.03]])],
+                  dict([["dist", "norm"], ["loc", 0], ["scale", 0.03]])],
                  [p.proposal, 0.03], [p.latex, r"r_{0.05}"]])]]))}]]))
 primordial.update(dict([
     ["SFSR_t_nrun", {
@@ -120,7 +121,7 @@ geometry: InfoDict = dict([
             ["omegak", dict([
                 [p.prior, dict([["min", -0.3], ["max", 0.3]])],
                 [p.ref,
-                 dict([[p.dist, "norm"], ["loc", -0.009], ["scale", 0.001]])],
+                 dict([["dist", "norm"], ["loc", -0.009], ["scale", 0.001]])],
                 [p.proposal, 0.001], [p.latex, r"\Omega_k"]])]])}], ])
 
 # Hubble parameter constraints
@@ -132,7 +133,7 @@ hubble: InfoDict = dict([
         _params: dict([
             ["H0", dict([
                 [p.prior, dict([["min", H0_min], ["max", H0_max]])],
-                [p.ref, dict([[p.dist, "norm"], ["loc", 67], ["scale", 2]])],
+                [p.ref, dict([["dist", "norm"], ["loc", 67], ["scale", 2]])],
                 [p.proposal, 2], [p.latex, r"H_0"]])]])}],
     ["H_DESpriors", {
         _desc: "Hubble parameter (reduced range for DES and lensing-only constraints)",
@@ -140,7 +141,7 @@ hubble: InfoDict = dict([
         _params: dict([
             ["H0", dict([
                 [p.prior, dict([["min", 55], ["max", 91]])],
-                [p.ref, dict([[p.dist, "norm"], ["loc", 67], ["scale", 2]])],
+                [p.ref, dict([["dist", "norm"], ["loc", 67], ["scale", 2]])],
                 [p.proposal, 2], [p.latex, r"H_0"]])]])}],
     ["sound_horizon_last_scattering", {
         _desc: "Angular size of the sound horizon at last scattering "
@@ -151,7 +152,7 @@ hubble: InfoDict = dict([
                     ["theta_MC_100", dict([
                         [p.prior, dict([["min", 0.5], ["max", 10]])],
                         [p.ref,
-                         dict([[p.dist, "norm"], ["loc", 1.04109],
+                         dict([["dist", "norm"], ["loc", 1.04109],
                                ["scale", 0.0004]])],
                         [p.proposal, 0.0002],
                         [p.latex, r"100\theta_\mathrm{MC}"],
@@ -166,7 +167,7 @@ hubble: InfoDict = dict([
                     ["theta_s_1e2", dict([
                         [p.prior, dict([["min", 0.5], ["max", 10]])],
                         [p.ref, dict([
-                            [p.dist, "norm"], ["loc", 1.0416], ["scale", 0.0004]])],
+                            ["dist", "norm"], ["loc", 1.0416], ["scale", 0.0004]])],
                         [p.proposal, 0.0002],
                         [p.latex, r"100\theta_\mathrm{s}"],
                         [p.drop, True]])],
@@ -186,12 +187,12 @@ matter: InfoDict = dict([
             ["omegabh2", dict([
                 [p.prior, dict([["min", 0.005], ["max", 0.1]])],
                 [p.ref,
-                 dict([[p.dist, "norm"], ["loc", 0.0224], ["scale", 0.0001]])],
+                 dict([["dist", "norm"], ["loc", 0.0224], ["scale", 0.0001]])],
                 [p.proposal, 0.0001], [p.latex, r"\Omega_\mathrm{b} h^2"]])],
             ["omegach2", dict([
                 [p.prior, dict([["min", 0.001], ["max", 0.99]])],
                 [p.ref,
-                 dict([[p.dist, "norm"], ["loc", 0.120], ["scale", 0.001]])],
+                 dict([["dist", "norm"], ["loc", 0.120], ["scale", 0.001]])],
                 [p.proposal, 0.0005], [p.latex, r"\Omega_\mathrm{c} h^2"]])],
             ["omegam", {p.latex: r"\Omega_\mathrm{m}"}]])}],
     ["Omegab, Omegam", {
@@ -201,13 +202,13 @@ matter: InfoDict = dict([
             ["omegab", dict([
                 [p.prior, dict([["min", 0.03], ["max", 0.07]])],
                 [p.ref,
-                 dict([[p.dist, "norm"], ["loc", 0.0495], ["scale", 0.004]])],
+                 dict([["dist", "norm"], ["loc", 0.0495], ["scale", 0.004]])],
                 [p.proposal, 0.004], [p.latex, r"\Omega_\mathrm{b}"],
                 [p.drop, True]])],
             ["omegam", dict([
                 [p.prior, dict([["min", 0.1], ["max", 0.9]])],
                 [p.ref,
-                 dict([[p.dist, "norm"], ["loc", 0.316], ["scale", 0.02]])],
+                 dict([["dist", "norm"], ["loc", 0.316], ["scale", 0.02]])],
                 [p.proposal, 0.02], [p.latex, r"\Omega_\mathrm{m}"],
                 [p.drop, True]])],
             ["omegabh2", dict([
@@ -242,14 +243,14 @@ neutrinos: InfoDict = dict([
                         ["mnu", dict([
                             [p.prior, dict([["min", 0], ["max", 5]])],
                             [p.ref, dict([
-                                [p.dist, "norm"], ["loc", 0.02], ["scale", 0.1]])],
+                                ["dist", "norm"], ["loc", 0.02], ["scale", 0.1]])],
                             [p.proposal, 0.03], [p.latex, r"\sum m_\nu"]])]])},
             _classy: {_extra_args: {"N_ncdm": 1, "deg_ncdm": 3, "N_ur": 0.00641},
                       _params: dict([
                           ["m_ncdm", dict([
                               [p.prior, dict([["min", 0], ["max", 1.667]])],
                               [p.ref, dict([
-                                  [p.dist, "norm"], ["loc", 0.0067],
+                                  ["dist", "norm"], ["loc", 0.0067],
                                   ["scale", 0.033]])],
                               [p.proposal, 0.01], [p.latex, r"m_\nu"]])],
                           ["mnu", dict([[p.derived, "lambda m_ncdm: 3 * m_ncdm"],
@@ -263,7 +264,7 @@ neutrinos: InfoDict = dict([
                         ["nnu", dict([
                             [p.prior, dict([["min", 0.05], ["max", 10]])],
                             [p.ref, dict([
-                                [p.dist, "norm"], ["loc", 3.046], ["scale", 0.05]])],
+                                ["dist", "norm"], ["loc", 3.046], ["scale", 0.05]])],
                             [p.proposal, 0.05],
                             [p.latex, r"N_\mathrm{eff}"]])]])},
             _classy: {_extra_args: {"N_ncdm": 1},
@@ -273,7 +274,7 @@ neutrinos: InfoDict = dict([
                           ["N_ur", dict([
                               [p.prior, dict([["min", 0.0001], ["max", 9]])],
                               [p.ref, dict([
-                                  [p.dist, "norm"], ["loc", 2.0328],
+                                  ["dist", "norm"], ["loc", 2.0328],
                                   ["scale", 0.05]])],
                               [p.proposal, 0.05],
                               [p.latex, r"N_\mathrm{ur}"]])],
@@ -316,11 +317,11 @@ neutrinos.update(dict([
 #    #     _params: dict([
 #    #         ["nnu", dict([
 #    #             [p.prior, dict([["min", 3.046], ["max", 10]])],
-#    #             [p.ref, dict([[p.dist, "norm"], ["loc", 3.046], ["scale", 0.05]])],
+#    #             [p.ref, dict([["dist", "norm"], ["loc", 3.046], ["scale", 0.05]])],
 #    #             [p.proposal, 0.05], [p.latex, r"N_\mathrm{eff}"]])],
 #    #         ["meffsterile", dict([
 #    #             [p.prior, dict([["min", 0], ["max", 3]])#,
-#    #             [p.ref, dict([[p.dist, "norm"], ["loc", 0.1], ["scale", 0.1]])],
+#    #             [p.ref, dict([["dist", "norm"], ["loc", 0.1], ["scale", 0.1]])],
 #    #             [p.proposal, 0.03],
 #    #             [p.latex, r"m_{\nu,\mathrm{sterile}}^\mathrm{eff}"]])]])}]
 
@@ -339,7 +340,7 @@ dark_energy: InfoDict = dict([
             ["w", dict([
                 [p.prior, dict([["min", -3], ["max", -0.333]])],
                 [p.ref,
-                 dict([[p.dist, "norm"], ["loc", -0.99], ["scale", 0.02]])],
+                 dict([["dist", "norm"], ["loc", -0.99], ["scale", 0.02]])],
                 [p.proposal, 0.02], [p.latex, r"w_\mathrm{DE}"]])]])}],
     ["de_w_wa", {
         _desc: "Varying constant eq of state with w(a) = w0 + (1-a) wa",
@@ -349,11 +350,11 @@ dark_energy: InfoDict = dict([
             ["w", dict([
                 [p.prior, dict([["min", -3], ["max", 1]])],
                 [p.ref,
-                 dict([[p.dist, "norm"], ["loc", -0.99], ["scale", 0.02]])],
+                 dict([["dist", "norm"], ["loc", -0.99], ["scale", 0.02]])],
                 [p.proposal, 0.02], [p.latex, r"w_{0,\mathrm{DE}}"]])],
             ["wa", dict([
                 [p.prior, dict([["min", -3], ["max", 2]])],
-                [p.ref, dict([[p.dist, "norm"], ["loc", 0], ["scale", 0.05]])],
+                [p.ref, dict([["dist", "norm"], ["loc", 0], ["scale", 0.05]])],
                 [p.proposal, 0.05], [p.latex, r"w_{a,\mathrm{DE}}"]])]])}]])
 
 # BBN
@@ -382,7 +383,7 @@ bbn = dict([
             ["yhe", dict([
                 [p.prior, dict([["min", 0.1], ["max", 0.5]])],
                 [p.ref,
-                 dict([[p.dist, "norm"], ["loc", 0.237], ["scale", 0.006]])],
+                 dict([["dist", "norm"], ["loc", 0.237], ["scale", 0.006]])],
                 [p.proposal, 0.006], [p.latex, r"Y_\mathrm{P}"]])]])}], ])
 
 # Reionization
@@ -394,7 +395,7 @@ reionization: InfoDict = dict([
             ["tau", dict([
                 [p.prior, dict([["min", 0.01], ["max", 0.8]])],
                 [p.ref,
-                 dict([[p.dist, "norm"], ["loc", 0.055], ["scale", 0.006]])],
+                 dict([["dist", "norm"], ["loc", 0.055], ["scale", 0.006]])],
                 [p.proposal, 0.003], [p.latex, r"\tau_\mathrm{reio}"]])],
             ["zrei", {p.latex: r"z_\mathrm{re}"}]])}],
     ["gauss_prior", {
@@ -403,9 +404,9 @@ reionization: InfoDict = dict([
         _params: dict([
             ["tau", dict([
                 [p.prior,
-                 dict([[p.dist, "norm"], ["loc", 0.07], ["scale", 0.02]])],
+                 dict([["dist", "norm"], ["loc", 0.07], ["scale", 0.02]])],
                 [p.ref,
-                 dict([[p.dist, "norm"], ["loc", 0.07], ["scale", 0.01]])],
+                 dict([["dist", "norm"], ["loc", 0.07], ["scale", 0.01]])],
                 [p.proposal, 0.005], [p.latex, r"\tau_\mathrm{reio}"]])],
             ["zrei", {p.latex: r"z_\mathrm{re}"}]])}],
     ["irrelevant", {

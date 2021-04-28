@@ -17,8 +17,9 @@ import os
 from cobaya.conventions import kinds, _prior, _timing, _params, _provides, \
     _overhead_time, _packages_path, _debug, _debug_default, _debug_file, _input_params, \
     _output_params, _get_chi2_name, _input_params_prefix, \
-    _output_params_prefix, empty_dict, InfoDict
-from cobaya.conventions import InputDict, LikesDict, TheoriesDict, ParamsDict, PriorsDict
+    _output_params_prefix, empty_dict
+from cobaya.typing import InfoDict, InputDict, LikesDict, TheoriesDict, \
+    ParamsDict, PriorsDict
 from cobaya.input import update_info, load_input_dict
 from cobaya.parameterization import Parameterization
 from cobaya.prior import Prior

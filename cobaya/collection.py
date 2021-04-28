@@ -11,13 +11,14 @@ import os
 import functools
 import numpy as np
 import pandas as pd
+from typing import Optional
 from getdist import MCSamples, chains
 from copy import deepcopy
 from math import isclose
 
 # Local
 from cobaya.conventions import _weight, _chi2, _minuslogpost, _minuslogprior, \
-    _get_chi2_name, _separator, Optional
+    _get_chi2_name, _separator
 from cobaya.tools import load_DataFrame
 from cobaya.log import LoggedError, HasLogger, NoLogging
 
