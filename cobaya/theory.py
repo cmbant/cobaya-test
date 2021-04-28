@@ -36,7 +36,7 @@ from typing import Sequence, Optional, Union, Tuple, Dict, Iterable
 # Local
 from cobaya.conventions import _external, kinds, _requires, _params, empty_dict, \
     _class_name
-from cobaya.typing import TheoryDict, TheoriesDict, InfoDict, ParamValuesDict
+from cobaya.typing import TheoryDict, TheoriesDict, InfoDict, ParamValuesDict, ParamsDict
 from cobaya.component import CobayaComponent, ComponentCollection
 from cobaya.tools import get_resolved_class, str_to_list
 from cobaya.log import LoggedError, always_stop_exceptions
@@ -49,6 +49,7 @@ class Theory(CobayaComponent):
     speed: float = -1
     stop_at_error: bool = False
     version: Optional[Union[dict, str]] = None
+    params: ParamsDict
 
     # special components set by the dependency resolver;
     # included in updated yaml but not in defaults
