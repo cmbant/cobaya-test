@@ -11,7 +11,7 @@
 from copy import deepcopy
 from cobaya.typing import InfoDict
 
-none = "(none)"
+none = "(None)"
 error_msg = "error_msg"
 
 # Theory codes
@@ -364,7 +364,7 @@ cmb_sampler_recommended: InfoDict = {"mcmc": {
     "drag": True, "oversample_power": 0.4, "proposal_scale": 1.9}}
 
 like_cmb: InfoDict = {
-    "(None)": {},
+    none: {},
     "planck_2018": {
         "desc": "Planck 2018 (Polarized CMB + lensing)",
         "note": None,
@@ -432,7 +432,7 @@ for name, m in like_cmb.items():
 #    "thetaeq":     {"latex": r"100\theta_\mathrm{eq}"},
 #    "thetarseq":   {"latex": r"100\theta_\mathrm{s,eq}"},
 
-like_bao = {"(None)": {},
+like_bao = {none: {},
             'BAO_planck_2018': {
                 'desc': 'Baryon acoustic oscillation data from DR12, MGS and 6DF',
                 'theory': theory,
@@ -440,7 +440,7 @@ like_bao = {"(None)": {},
                                'bao.sdss_dr12_consensus_bao': None}}}
 
 like_des: InfoDict = \
-    {"(None)": {},
+    {none: {},
      "des_y1_clustering": {
          "desc": "Galaxy clustering from DES Y1",
          "theory": {theo: {"extra_args": base_precision[theo]}
@@ -462,14 +462,14 @@ like_des: InfoDict = \
                     for theo in ["camb", "classy"]},
          "likelihood": {"des_y1.joint": None}}}
 
-like_sn: InfoDict = {"(None)": {},
+like_sn: InfoDict = {none: {},
                      "Pantheon": {
                          "desc": "Supernovae data from the Pantheon sample",
                          "theory": theory,
                          "likelihood": {"sn.pantheon": None}}}
 
 like_H0: InfoDict = \
-    {"(None)": {},
+    {none: {},
      "Riess2018a": {
          "desc": "Local H0 measurement from Riess et al. 2018a (used in Planck 2018)",
          "theory": theory,
@@ -511,7 +511,7 @@ planck_base_model = {
 default_sampler = {"sampler": "MCMC"}
 
 preset: InfoDict = dict([
-    ["(None)", {"desc": "(No preset chosen)"}],
+    [none, {"desc": "(No preset chosen)"}],
     # Pure CMB #######################################################
     ["planck_2018_camb", {
         "desc": "Planck 2018 with CAMB",
@@ -580,7 +580,7 @@ for pre in preset.values():
 
 # Lensing-only ###################################################
 preset.update({
-    "(None)": {"desc": "(No preset chosen)"},
+    none: {"desc": "(No preset chosen)"},
     "planck_2018_DES_lensingonly_camb": {
         "desc": "Planck 2018 + DES Y1 lensing-only with CAMB",
         "theory": "camb",

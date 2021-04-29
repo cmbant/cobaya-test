@@ -285,22 +285,23 @@ def test_pk_binning(packages_path, skip_not_installed):
     k_min_bin = -5.5
     k_max_bin = 2
 
-    _info = {'packages_path': process_packages_path(packages_path),
-             'likelihood': {'cmb': Pklike},
-             'theory': {'camb': {"external_primordial_pk": True},
-                        'my_pk': {"external": BinnedPk,
-                                  'nbins': nbins, 'k_min_bin': k_min_bin,
-                                  'k_max_bin': k_max_bin
-                                  }},
-             'params': {
-                 "ombh2": 0.022274,
-                 "omch2": 0.11913,
-                 "cosmomc_theta": 0.01040867,
-                 "tau": tau,
-                 "nnu": 3.046
-             },
-             'stop_at_error': True,
-             'debug': debug}
+    _info: InputDict = \
+        {'packages_path': process_packages_path(packages_path),
+         'likelihood': {'cmb': Pklike},
+         'theory': {'camb': {"external_primordial_pk": True},
+                    'my_pk': {"external": BinnedPk,
+                              'nbins': nbins, 'k_min_bin': k_min_bin,
+                              'k_max_bin': k_max_bin
+                              }},
+         'params': {
+             "ombh2": 0.022274,
+             "omch2": 0.11913,
+             "cosmomc_theta": 0.01040867,
+             "tau": tau,
+             "nnu": 3.046
+         },
+         'stop_at_error': True,
+         'debug': debug}
     scale = 1e-9
     ks = np.logspace(k_min_bin, k_max_bin, nbins)
 

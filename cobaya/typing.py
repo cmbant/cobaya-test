@@ -17,8 +17,15 @@ LikesDict = Dict[str, Union[None, LikeDict, Type]]
 SamplersDict = Dict[str, Optional[SamplerDict]]
 PriorsDict = Dict[str, Union[str, callable]]
 
-if sys.version_info >= (3, 8):
-
+if sys.version_info < (3, 8):
+    InputDict = InfoDict
+    ParamDict = InfoDict
+    ModelDict = InfoDict
+    PostDict = InfoDict
+    ParamsDict = Dict[str, Union[None, ParamDict, float, Sequence[float]]]
+    partags = {"prior", "ref", "proposal", "value", "drop",
+               "derived", "latex", "renames", "min", "max"}
+else:
     from typing import TypedDict
 
 
@@ -81,15 +88,6 @@ if sys.version_info >= (3, 8):
         packages_path: Optional[str]
         output: Optional[str]
         version: Optional[Union[str, InfoDict]]
-
-else:
-    InputDict = InfoDict
-    ParamDict = InfoDict
-    ModelDict = InfoDict
-    PostDict = InfoDict
-    ParamsDict = Dict[str, Union[None, ParamDict, float, Sequence[float]]]
-    partags = {"prior", "ref", "proposal", "value", "drop",
-               "derived", "latex", "renames", "min", "max"}
 
 try:
     from numpy.typing import ArrayLike
