@@ -27,7 +27,7 @@ kinds = ("sampler", "theory", "likelihood")
 reserved_attributes = {"input_params", "output_params", "install_options", "bibtex_file"}
 
 # Conventional order for yaml dumping (purely cosmetic)
-dump_sort_cosmetic = ("theory", "likelihood", "prior", "params", "sampler", "post")
+dump_sort_cosmetic = ["theory", "likelihood", "prior", "params", "sampler", "post"]
 
 # Separator for
 # fields in parameter names and files
