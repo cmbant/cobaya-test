@@ -427,8 +427,8 @@ class BoltzmannBase(Theory):
 
         ``params_info`` should contain preferably the slow parameters only.
         """
-        from cobaya.cosmo_input import _get_best_covmat
-        return _get_best_covmat(self.packages_path, params_info, likes_info)
+        from cobaya.cosmo_input import get_best_covmat
+        return get_best_covmat(self.packages_path, params_info, likes_info)
 
 
 class PowerSpectrumInterpolator(RectBivariateSpline):

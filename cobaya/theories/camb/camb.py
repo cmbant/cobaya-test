@@ -183,7 +183,6 @@ from cobaya.install import download_github_release, check_gcc_version, NotInstal
 from cobaya.tools import getfullargspec, get_class_methods, get_properties, load_module, \
     VersionCheckError, str_to_list
 from cobaya.theory import HelperTheory
-from cobaya.conventions import "requires"
 from cobaya.typing import OptionalArrayLike
 
 
@@ -677,6 +676,7 @@ class camb(BoltzmannBase):
         params_derived = list(get_class_methods(self.camb.CAMBparams))
         params_derived.remove("custom_source_names")
         fields = []
+        # noinspection PyProtectedMember
         for f, tp in self.camb.CAMBparams._fields_:
             if tp is ctypes.c_double and 'max_eta_k' not in f \
                     and f not in ['Alens', 'num_nu_massless']:

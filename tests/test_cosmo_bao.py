@@ -1,7 +1,6 @@
 from copy import deepcopy
 import pytest
 
-from cobaya.conventions import "class"
 from cobaya.tools import get_class
 
 from .test_cosmo_planck_2015 import params_lowTEB_highTTTEEE, derived_lowTEB_highTTTEEE

@@ -611,6 +611,7 @@ def _fast_norm_logpdf(self, x):
     if not hasattr(self, "_cobaya_mlogscale"):
         self._cobaya_mlogscale = -np.log(self.kwds["scale"])
     x_ = (np.array(x) - self.kwds["loc"]) / self.kwds["scale"]
+    # noinspection PyProtectedMember
     return self.dist._logpdf(x_) + self._cobaya_mlogscale
 
 

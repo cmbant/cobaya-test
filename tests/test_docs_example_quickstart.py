@@ -10,7 +10,6 @@ import pytest
 
 from cobaya.yaml import yaml_load_file
 from cobaya.input import is_equal_info
-from cobaya.conventions import "output"
 from cobaya.tools import KL_norm
 from .common_sampler import KL_tolerance
 from .common import stdout_redirector

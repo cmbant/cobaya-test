@@ -10,7 +10,6 @@ import os
 from getdist import IniFile
 
 # Local
-from cobaya.conventions import "packages_path"
 from cobaya.log import LoggedError
 from cobaya.install import NotInstalledError
 from .InstallableLikelihood import InstallableLikelihood

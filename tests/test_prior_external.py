@@ -12,7 +12,6 @@ For manual testing, and observing/plotting the density, pass `manual=True`
 to `body of test`.
 """
 # Local
-from cobaya.conventions import "prior"
 from .common_external import info_string, info_callable, info_mixed, info_import
 from .common_external import body_of_test
 

@@ -14,7 +14,6 @@ from copy import deepcopy
 import functools
 
 # Local
-from cobaya.conventions import "debug", "debug_file"
 from cobaya import mpi
 
 

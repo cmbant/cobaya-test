@@ -5,7 +5,6 @@ to make sure it remains up to date.
 
 import os
 
-from cobaya.conventions import "packages_path"
 from .common import process_packages_path
 from .conftest import install_test_wrapper
 
@@ -13,7 +12,6 @@ tests_folder = os.path.dirname(os.path.realpath(__file__))
 docs_folder = os.path.join(tests_folder, "..", "docs")
 docs_src_folder = os.path.join(docs_folder, "src_examples", "cosmo_external_likelihood")
 docs_img_folder = os.path.join(docs_folder, "img")
-
 
 
 def test_cosmo_docs_likelihood_camb(packages_path, skip_not_installed):
