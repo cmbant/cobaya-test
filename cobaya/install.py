@@ -25,8 +25,9 @@ from cobaya.log import logger_setup, LoggedError, NoLogging
 from cobaya.tools import create_banner, warn_deprecation, get_resolved_class, \
     write_packages_path_in_config_file, get_config_path, get_kind
 from cobaya.input import get_used_components
-from cobaya.conventions import code_path, data_path, packages_path_arg, packages_path_env, \
-    Extension, install_skip_env, packages_path_arg_posix, packages_path_config_file
+from cobaya.conventions import code_path, data_path, packages_path_arg, \
+    packages_path_env, Extension, install_skip_env, packages_path_arg_posix, \
+    packages_path_config_file
 from cobaya.mpi import set_mpi_disabled
 from cobaya.tools import resolve_packages_path
 
@@ -43,9 +44,9 @@ class NotInstalledError(LoggedError):
     """
 
 
-# noinspection PyUnresolvedReferences
 def install(*infos, **kwargs):
     debug = kwargs.get("debug")
+    # noinspection PyUnresolvedReferences
     if not log.root.handlers:
         logger_setup()
     path = kwargs.get("path")
@@ -75,7 +76,7 @@ def install(*infos, **kwargs):
     # NB: if passed with quotes as `--skip "a b"`, it's interpreted as a single key
     skip_keywords_arg = set(chain(*[word.split() for word in skip_keywords_arg]))
     skip_keywords_env = set(
-        os.environ.get(_install_skip_env, "").replace(",", " ").lower().split())
+        os.environ.get(install_skip_env, "").replace(",", " ").lower().split())
     skip_keywords = skip_keywords_arg.union(skip_keywords_env)
     used_components, components_infos = get_used_components(*infos, return_infos=True)
     for kind, components in used_components.items():
