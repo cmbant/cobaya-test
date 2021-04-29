@@ -138,19 +138,20 @@ class BBN_with_theory_errors(BBN, LikelihoodInterface):
         state['logp'] = -params_values_dict['BBN_delta'] ** 2 / 2
 
 
-info_error = {'likelihood': dict([('cmb', cmb_likelihood_info),
-                                  ('BBN', BBN_likelihood)]),
-              'theory': {'camb': {"requires": ['YHe', 'ombh2']}},
-              'params': dict(YHe={'prior': {'min': 0, 'max': 1}}, **camb_params),
-              'debug': debug}
+info_error: InputDict = {'likelihood': dict([('cmb', cmb_likelihood_info),
+                                             ('BBN', BBN_likelihood)]),
+                         'theory': {'camb': {"requires": ['YHe', 'ombh2']}},
+                         'params': dict(YHe={'prior': {'min': 0, 'max': 1}},
+                                        **camb_params),
+                         'debug': debug}
 
-info_error2 = {'likelihood': {'cmb': cmb_likelihood_info,
-                              'BBN': {'external': BBN_with_theory_errors,
-                                      'provides': 'YHe'}},
-               'theory': {'camb': {"requires": ['YHe', 'ombh2']}},
-               'params': dict(BBN_delta={'prior': {'min': -5, 'max': 5}},
-                              **camb_params),
-               'debug': debug}
+info_error2: InputDict = {'likelihood': {'cmb': cmb_likelihood_info,
+                                         'BBN': {'external': BBN_with_theory_errors,
+                                                 'provides': 'YHe'}},
+                          'theory': {'camb': {"requires": ['YHe', 'ombh2']}},
+                          'params': dict(BBN_delta={'prior': {'min': -5, 'max': 5}},
+                                         **camb_params),
+                          'debug': debug}
 
 
 def test_bbn_likelihood(packages_path, skip_not_installed):

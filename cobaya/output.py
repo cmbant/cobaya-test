@@ -13,10 +13,11 @@ import re
 import shutil
 import logging
 from packaging import version
-
+from typing import Optional
 # Local
 from cobaya.yaml import yaml_dump, yaml_load, yaml_load_file, OutputError
 from cobaya.conventions import resume_default, Extension, kinds, get_version
+from cobaya.typing import InputDict
 from cobaya.log import LoggedError, HasLogger, get_traceback_text
 from cobaya.input import is_equal_info, get_resolved_class, load_info_dump, split_prefix
 from cobaya.input import get_info_path
@@ -254,10 +255,10 @@ class Output(HasLogger):
         self._resuming = value
 
     @mpi.from_root
-    def load_updated_info(self, cache=False, use_cache=False):
+    def load_updated_info(self, cache=False, use_cache=False) -> Optional[InputDict]:
         return self.reload_updated_info(cache=cache, use_cache=use_cache)
 
-    def reload_updated_info(self, cache=False, use_cache=False):
+    def reload_updated_info(self, cache=False, use_cache=False) -> Optional[InputDict]:
         if mpi.is_main_process():
             if use_cache and hasattr(self, "_old_updated_info"):
                 return self._old_updated_info

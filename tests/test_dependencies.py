@@ -140,7 +140,7 @@ def test_dependencies(packages_path):
                        ('C', {'external': C, 'provides': ['Bout']})])
     assert "more than one component provides Bout" in str(e.value)
 
-    inf = info.copy()
+    inf: InputDict = info.copy()
     inf['params'] = info['params'].copy()
     inf['params']['notused'] = [1, 10, 2, 5, 1]
     inf['theory'] = dict(theories)

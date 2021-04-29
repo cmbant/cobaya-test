@@ -41,9 +41,7 @@ def body_of_test(packages_path, best_fit, info_likelihood, info_theory, ref_chi2
     info["packages_path"] = process_packages_path(packages_path)
     # Ask for debug output and force stopping at any error
     info["debug"] = True
-    for k in ["theory", "likelihood"]:
-        for m in info[k]:
-            info[k][m].update({"stop_at_error": True})
+    info["stop_at_error"] = True
     # Create the model and compute likelihood and derived parameters at best fit
     model = install_test_wrapper(skip_not_installed, get_model, info)
     best_fit_values = {p: best_fit[p] for p in model.parameterization.sampled_params()}

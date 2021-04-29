@@ -225,6 +225,7 @@ def add_aggregated_chi2_params(param_info, all_types):
             "latex": get_chi2_label(t), "derived": True}
 
 
+# noinspection PyTypedDict
 def update_info(info: InputDict) -> InputDict:
     """
     Creates an updated info starting from the defaults for each component and updating it

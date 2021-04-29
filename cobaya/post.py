@@ -68,6 +68,7 @@ class DummyModel:
         self.likelihood = list(info_likelihood)
 
 
+# noinspection PyTypedDict
 @mpi.sync_state
 def post(info_or_yaml_or_file: Union[InputDict, str, os.PathLike],
          sample: Union[Collection, List[Collection], None] = None
@@ -92,16 +93,18 @@ def post(info_or_yaml_or_file: Union[InputDict, str, os.PathLike],
                                "main block not under 'post'). ")
     # 1. Load existing sample
     output_in = get_output(prefix=info.get("output"))
-    info_in: InputDict
     if output_in:
         info_in = output_in.load_updated_info() or update_info(info)
     else:
         info_in = update_info(info)
+    info_in: InputDict  # temp workaround for typing bug
     dummy_model_in = DummyModel(info_in["params"], info_in.get("likelihood", {}),
                                 info_in.get("prior"))
+
     in_collections = []
     thin = info_post.get("thin", 1)
     skip = info_post.get("skip", 0)
+    # noinspection PyTypedDict
     if info.get('thin') is not None or info.get('skip') is not None:
         raise LoggedError(log, "'thin' and 'skip' should be "
                                "parameters of the 'post' block")
@@ -251,7 +254,7 @@ def post(info_or_yaml_or_file: Union[InputDict, str, os.PathLike],
                     log, "Trying to remove %s '%s', but it is not present. "
                          "Existing ones: %r", kind, remove_item, list(out_combined[kind]))
         if kind != "theory" and kind in add:
-            dups = set(add.get(kind)).intersection(out_combined[kind]) - {"one"}
+            dups = set(add.get(kind) or []).intersection(out_combined[kind]) - {"one"}
             if dups:
                 raise LoggedError(
                     log, "You have added %s '%s', which was already present. If you "
@@ -320,6 +323,7 @@ def post(info_or_yaml_or_file: Union[InputDict, str, os.PathLike],
     info_post = info_post.copy()
     info_out["post"] = info_post
     # Updated with input info and extended (updated) add info
+    # noinspection PyTypeChecker
     info_out.update(info_in)
     info_post["add"] = add
 

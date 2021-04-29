@@ -1,5 +1,4 @@
-import sys
-from typing import Dict, Any, Optional, Union, Sequence, Type, Tuple
+from typing import Dict, Any, Optional, Union, Sequence, Type, Tuple, List
 import numpy as np
 from types import MappingProxyType
 
@@ -17,17 +16,19 @@ LikesDict = Dict[str, Union[None, LikeDict, Type]]
 SamplersDict = Dict[str, Optional[SamplerDict]]
 PriorsDict = Dict[str, Union[str, callable]]
 
-if sys.version_info < (3, 8):
+partags = {"prior", "ref", "proposal", "value", "drop",
+           "derived", "latex", "renames", "min", "max"}
+
+try:
+    # noinspection PyUnresolvedReferences
+    from typing import TypedDict
+except ImportError:
     InputDict = InfoDict
     ParamDict = InfoDict
     ModelDict = InfoDict
     PostDict = InfoDict
-    ParamsDict = Dict[str, Union[None, ParamDict, float, Sequence[float]]]
-    partags = {"prior", "ref", "proposal", "value", "drop",
-               "derived", "latex", "renames", "min", "max"}
+    ParamsDict = Dict[str, Union[ParamDict, None, str, float, List[float]]]
 else:
-    from typing import TypedDict
-
 
     class SciPyDistDict(TypedDict):
         dist: str
@@ -54,9 +55,9 @@ else:
         max: float
 
 
-    partags = set(ParamDict.__annotations__)
+    # partags = set(ParamDict.__annotations__)
 
-    ParamsDict = Dict[str, Union[None, ParamDict, float, Sequence[float]]]
+    ParamsDict = Dict[str, Union[ParamDict, None, str, float, List[float]]]
 
 
     class ModelDict(TypedDict, total=False):
@@ -85,6 +86,7 @@ else:
         resume: bool
         stop_at_error: bool
         test: bool
+        timing: bool
         packages_path: Optional[str]
         output: Optional[str]
         version: Optional[Union[str, InfoDict]]
