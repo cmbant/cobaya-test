@@ -34,9 +34,8 @@ import inspect
 from collections import deque
 from typing import Sequence, Optional, Union, Tuple, Dict, Iterable
 # Local
-from cobaya.conventions import _external, kinds, _requires, _params, empty_dict, \
-    _class_name
-from cobaya.typing import TheoryDict, TheoriesDict, InfoDict, ParamValuesDict, ParamsDict
+from cobaya.typing import TheoryDict, TheoriesDict, InfoDict, ParamValuesDict, \
+    ParamsDict, empty_dict
 from cobaya.component import CobayaComponent, ComponentCollection
 from cobaya.tools import get_resolved_class, str_to_list
 from cobaya.log import LoggedError, always_stop_exceptions
@@ -83,7 +82,7 @@ class Theory(CobayaComponent):
         :return: dictionary or list of tuples of of requirement names and options
                 (or iterable of requirement names if no optional parameters are needed)
         """
-        return str_to_list(getattr(self, _requires, []))
+        return str_to_list(getattr(self, "requires", []))
 
     def must_provide(self, **requirements) -> Union[None, InfoDict, Sequence[str],
                                                     Sequence[Tuple[str, InfoDict]]]:
@@ -182,7 +181,7 @@ class Theory(CobayaComponent):
 
         :return: iterable of parameter names
         """
-        params = getattr(self, _params, None)
+        params = getattr(self, "params", None)
         if params:
             return [k for k, v in params.items() if
                     hasattr(v, 'get') and v.get('derived') is True]
@@ -372,15 +371,15 @@ class TheoryCollection(ComponentCollection):
                 if isinstance(info, Theory):
                     self.add_instance(name, info)
                 else:
-                    if _external in info:
-                        theory_class = info[_external]
+                    if "external" in info:
+                        theory_class = info["external"]
                         if not inspect.isclass(theory_class) or \
                                 not issubclass(theory_class, Theory):
                             raise LoggedError(self.log,
                                               "Theory %s is not a Theory subclass", name)
                     else:
                         theory_class = get_resolved_class(
-                            name, kind=kinds.theory, class_name=info.get(_class_name))
+                            name, kind="theory", class_name=info.get("class"))
                     self.add_instance(
                         name, theory_class(
                             info, packages_path=packages_path, timing=timing, name=name))

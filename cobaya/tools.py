@@ -33,10 +33,8 @@ with warnings.catch_warnings():
     from fuzzywuzzy import process as fuzzy_process
 
 # Local
-from cobaya import __obsolete__
-from cobaya.conventions import _cobaya_package, subfolders, kinds, _packages_path, \
-    _packages_path_config_file, _packages_path_env, _packages_path_arg, \
-    _dump_sort_cosmetic
+from cobaya.conventions import cobaya_package, subfolders, kinds, \
+    packages_path_config_file, packages_path_env, packages_path_arg, dump_sort_cosmetic
 from cobaya.log import LoggedError
 
 # Set up logger
@@ -91,7 +89,7 @@ def get_base_classes():
     from cobaya.likelihood import Likelihood
     from cobaya.theory import Theory
     from cobaya.sampler import Sampler
-    return {kinds.sampler: Sampler, kinds.likelihood: Likelihood, kinds.theory: Theory}
+    return {"sampler": Sampler, "likelihood": Likelihood, "theory": Theory}
 
 
 def get_kind(name, allow_external=True):
@@ -212,7 +210,7 @@ def get_class(name, kind=None, None_if_not_found=False, allow_external=True,
             return return_class(module_name)
         elif allow_internal:
             internal_module_name = get_internal_class_component_name(module_name, kind)
-            return return_class(internal_module_name, package=_cobaya_package)
+            return return_class(internal_module_name, package=cobaya_package)
         else:
             raise Exception()
     except:
@@ -499,12 +497,13 @@ def load_DataFrame(file_name, skip=0, root_file_name=None):
             # try getdist format chains with .paramnames file
             if root_file_name and os.path.exists(root_file_name + '.paramnames'):
                 from getdist import ParamNames
-                from cobaya.conventions import _chi2, _separator
+                from cobaya.conventions import OutPar, derived_par_name_separator
                 names = ParamNames(root_file_name + '.paramnames').list()
                 for i, name in enumerate(names):
-                    if name.startswith(_chi2 + '_') and not name.startswith(
-                            _chi2 + _separator):
-                        names[i] = name.replace(_chi2 + '_', _chi2 + _separator)
+                    if name.startswith(OutPar.chi2 + '_') and not name.startswith(
+                            OutPar.chi2 + derived_par_name_separator):
+                        names[i] = name.replace(OutPar.chi2 + '_',
+                                                OutPar.chi2 + derived_par_name_separator)
                 cols = ['weight', 'minuslogpost'] + names
                 inp.seek(0)
             else:
@@ -700,7 +699,7 @@ def create_banner(msg, symbol="*", length=None):
     """
     msg_clean = cleandoc(msg)
     if not length:
-        length = max([len(line) for line in msg_clean.split("\n")])
+        length = max(len(line) for line in msg_clean.split("\n"))
     return symbol * length + "\n" + msg_clean + "\n" + symbol * length + "\n"
 
 
@@ -710,6 +709,7 @@ def warn_deprecation_version(logger=None):
     Unless intentionally doing so, please, update asap to the latest version
     (e.g. with ``python -m pip install cobaya --upgrade``).
     """
+    from cobaya import __obsolete__
     if __obsolete__:
         for line in create_banner(msg).split("\n"):
             getattr(logger, "warning", (lambda x: print("*WARNING*", x)))(line)
@@ -934,7 +934,7 @@ def load_config_file():
     from cobaya.yaml import yaml_load_file
     try:
         return yaml_load_file(
-            os.path.join(get_config_path(), _packages_path_config_file))
+            os.path.join(get_config_path(), packages_path_config_file))
     except:
         return {}
 
@@ -950,7 +950,7 @@ def write_config_file(config_info, append=True):
         if append:
             info.update(load_config_file())
         info.update(config_info)
-        yaml_dump_file(os.path.join(get_config_path(), _packages_path_config_file),
+        yaml_dump_file(os.path.join(get_config_path(), packages_path_config_file),
                        info, error_if_exists=False)
     except Exception as e:
         log.error("Could not write the external packages installation path into the "
@@ -962,7 +962,7 @@ def load_packages_path_from_config_file():
     Returns the external packages path stored in the config file,
     or `None` if it can't be found.
     """
-    return load_config_file().get(_packages_path)
+    return load_config_file().get("packages_path")
 
 
 def write_packages_path_in_config_file(packages_path):
@@ -971,7 +971,7 @@ def write_packages_path_in_config_file(packages_path):
 
     Relative paths are converted into absolute ones.
     """
-    write_config_file({_packages_path: os.path.abspath(packages_path)})
+    write_config_file({"packages_path": os.path.abspath(packages_path)})
 
 
 def resolve_packages_path(infos=None):
@@ -986,7 +986,7 @@ def resolve_packages_path(infos=None):
         in the config file.
     
         If no path at all could be found, returns `None`.
-        """ % _packages_path_env
+        """ % packages_path_env
     if not infos:
         infos = []
     elif isinstance(infos, Mapping):
@@ -995,7 +995,7 @@ def resolve_packages_path(infos=None):
     # BEHAVIOUR TO BE REPLACED BY ERROR:
     [check_deprecated_modules_path(info) for info in infos]
     # END OF DEPRECATION BLOCK
-    paths = set(p for p in [info.get(_packages_path) for info in infos] if p)
+    paths = set(p for p in [info.get("packages_path") for info in infos] if p)
     if len(paths) == 1:
         return list(paths)[0]
     elif len(paths) > 1:
@@ -1003,15 +1003,15 @@ def resolve_packages_path(infos=None):
             log, "More than one packages installation path defined in the given infos. "
                  "Cannot resolve a unique one to use. "
                  "Maybe specify one via a command line argument '-%s [...]'?",
-            _packages_path_arg[0])
-    path_env = os.environ.get(_packages_path_env)
+            packages_path_arg[0])
+    path_env = os.environ.get(packages_path_env)
     # MARKED FOR DEPRECATION IN v3.0
     old_env = "COBAYA_MODULES"
     path_old_env = os.environ.get(old_env)
     if path_old_env and not path_env:
         log.warning("*DEPRECATION*: The env var %r will be deprecated in favor of %r in "
                     "the next version. Please, use that one instead.",
-                    old_env, _packages_path_env)
+                    old_env, packages_path_env)
         # BEHAVIOUR TO BE REPLACED BY ERROR:
         path_env = path_old_env
     # END OF DEPRECATION BLOCK -- CONTINUES BELOW!
@@ -1025,9 +1025,9 @@ def sort_cosmetic(info):
     """
         Returns a sorted version of the given info dict, re-ordered as %r, and finally the
         rest of the blocks/options.
-        """ % _dump_sort_cosmetic
+        """ % dump_sort_cosmetic
     sorted_info = dict()
-    for k in _dump_sort_cosmetic:
+    for k in dump_sort_cosmetic:
         if k in info:
             sorted_info[k] = info[k]
     sorted_info.update({k: v for k, v in info.items() if k not in sorted_info})
@@ -1039,8 +1039,8 @@ def check_deprecated_modules_path(info):
     if info.get("modules"):
         log.warning("*DEPRECATION*: The input field 'modules' will be deprecated in "
                     "favor of %r in the next version. Please, use that one instead.",
-                    _packages_path)
+                    "packages_path")
         # BEHAVIOUR TO BE REPLACED BY ERROR:
-        if not info.get(_packages_path):
-            info[_packages_path] = info["modules"]
+        if not info.get("packages_path"):
+            info["packages_path"] = info["modules"]
 # END OF DEPRECATION BLOCK

@@ -7,7 +7,7 @@ from cobaya.theory import Theory
 from cobaya.run import run
 from cobaya import mpi
 from cobaya.log import LoggedError
-from cobaya.conventions import _packages_path, _dill_extension
+from cobaya.conventions import Extension
 from cobaya.typing import InputDict, PostDict
 from cobaya.tools import deepcopy_where_possible
 from cobaya.cosmo_input.convert_cosmomc import cosmomc_root_to_cobaya_info_dict
@@ -95,12 +95,12 @@ def test_cosmo_run_resume_post(tmpdir, packages_path=None):
     # only vary As, so fast chain
     info['output'] = os.path.join(tmpdir, 'testchain')
     if packages_path:
-        info[_packages_path] = process_packages_path(packages_path)
+        info["packages_path"] = process_packages_path(packages_path)
     run(info, force=True)
     # note that continuing from files leads to text-file precision at read in, so a mix of
     # precision in the output Collection returned from run
     run(info, resume=True, override={'sampler': {'mcmc': {'Rminus1_stop': 0.2}}})
-    updated_info, sampler = run(info['output'] + '.updated' + _dill_extension,
+    updated_info, sampler = run(info['output'] + '.updated' + Extension.dill,
                                 resume=True,
                                 override={'sampler': {'mcmc': {'Rminus1_stop': 0.05}}})
     results = mpi.allgather(sampler.products()["sample"])

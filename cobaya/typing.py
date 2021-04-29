@@ -1,6 +1,10 @@
 import sys
 from typing import Dict, Any, Optional, Union, Sequence, Type, Tuple
 import numpy as np
+from types import MappingProxyType
+
+# an immutable empty dict (e.g. for argument defaults)
+empty_dict = MappingProxyType({})
 
 InfoDict = Dict[str, Any]
 LikeDict = InfoDict

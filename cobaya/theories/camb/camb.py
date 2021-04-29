@@ -183,7 +183,7 @@ from cobaya.install import download_github_release, check_gcc_version, NotInstal
 from cobaya.tools import getfullargspec, get_class_methods, get_properties, load_module, \
     VersionCheckError, str_to_list
 from cobaya.theory import HelperTheory
-from cobaya.conventions import _requires
+from cobaya.conventions import "requires"
 from cobaya.typing import OptionalArrayLike
 
 
@@ -256,7 +256,7 @@ class camb(BoltzmannBase):
 
         self.nonlin_args, self.nonlin_params = self._extract_params(nonlin.set_params)
 
-        self.requires = str_to_list(getattr(self, _requires, []))
+        self.requires = str_to_list(getattr(self, "requires", []))
         self._transfer_requires = [p for p in self.requires if
                                    p not in self.get_can_support_params()]
         self.requires = [p for p in self.requires if p not in self._transfer_requires]
@@ -781,7 +781,7 @@ class camb(BoltzmannBase):
         self._camb_transfers = CambTransfers(self, 'camb.transfers',
                                              dict(stop_at_error=self.stop_at_error),
                                              timing=self.timer)
-        setattr(self._camb_transfers, _requires, self._transfer_requires)
+        setattr(self._camb_transfers, "requires", self._transfer_requires)
         return {'camb.transfers': self._camb_transfers}
 
     def get_speed(self):

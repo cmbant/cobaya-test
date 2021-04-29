@@ -126,7 +126,7 @@ class Parameterization(HasLogger):
         self._derived_args = {}
         self._derived_dependencies = {}
         # Notice here that expand_info_param *always* adds a "derived":True tag
-        # to infos without _prior or "value", and a "value" field
+        # to infos without "prior" or "value", and a "value" field
         # to fixed params
         for p, info in info_params.items():
             if isinstance(info, Mapping) and not set(info).issubset(partags):

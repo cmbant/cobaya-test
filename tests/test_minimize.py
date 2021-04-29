@@ -6,7 +6,6 @@ from flaky import flaky
 import pytest
 import os
 
-from cobaya.conventions import kinds
 from cobaya.typing import InputDict
 from cobaya.run import run
 from cobaya import mpi
@@ -39,12 +38,12 @@ def test_minimize_gaussian(tmpdir):
     # info = info_random_gaussian_mixture(ranges=ranges, n_modes=n_modes,
     #      input_params_prefix = "a_", derived = True)
     info: InputDict = info_min.copy()
-    mean = info[kinds.likelihood]["gaussian_mixture"]["means"][0]
-    cov = info[kinds.likelihood]["gaussian_mixture"]["covs"][0]
+    mean = info["likelihood"]["gaussian_mixture"]["means"][0]
+    cov = info["likelihood"]["gaussian_mixture"]["covs"][0]
     maxloglik = multivariate_normal.logpdf(mean, mean=mean, cov=cov)
     if mpi.is_main_process():
         print("Maximum of the gaussian mode to be found: %s" % mean)
-    info[kinds.sampler] = {"minimize": {"ignore_prior": True}}
+    info["sampler"] = {"minimize": {"ignore_prior": True}}
     info["debug"] = False
     info["debug_file"] = None
 

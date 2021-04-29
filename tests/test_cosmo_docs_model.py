@@ -7,7 +7,7 @@ import os
 import numpy as np
 from io import StringIO
 
-from cobaya.conventions import _packages_path
+from cobaya.conventions import "packages_path"
 from .common import process_packages_path, stdout_redirector
 from .conftest import install_test_wrapper
 
@@ -28,7 +28,7 @@ def test_cosmo_docs_model_classy(packages_path, skip_not_installed):
         os.chdir(docs_src_folder)
         globals_example = {}
         exec(open(os.path.join(docs_src_folder, "1.py")).read(), globals_example)
-        globals_example["info"][_packages_path] = packages_path
+        globals_example["info"]["packages_path"] = packages_path
         install_test_wrapper(
             skip_not_installed, exec,
             open(os.path.join(docs_src_folder, "2.py")).read(), globals_example)

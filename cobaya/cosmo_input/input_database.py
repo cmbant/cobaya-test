@@ -9,10 +9,10 @@
 
 # Global
 from copy import deepcopy
-
-# Local
-from cobaya.conventions import kinds, _params
 from cobaya.typing import InfoDict
+
+none = "(none)"
+error_msg = "error_msg"
 
 # Theory codes
 theory: InfoDict = {"camb": None, "classy": None}
@@ -211,8 +211,8 @@ matter: InfoDict = {
                  'latex': '\\Omega_\\mathrm{c} h^2'}}}}
 
 for m in matter.values():
-    m[_params]["omegamh2"] = {"derived": "lambda omegam, H0: omegam*(H0/100)**2",
-                              "latex": r"\Omega_\mathrm{m} h^2"}
+    m["params"]["omegamh2"] = {"derived": "lambda omegam, H0: omegam*(H0/100)**2",
+                               "latex": r"\Omega_\mathrm{m} h^2"}
 
 # Neutrinos and other extra matter
 neutrinos: InfoDict = {
@@ -368,20 +368,20 @@ like_cmb: InfoDict = {
     "planck_2018": {
         "desc": "Planck 2018 (Polarized CMB + lensing)",
         "note": None,
-        kinds.sampler: cmb_sampler_recommended,
-        kinds.theory: {theo: {"extra_args": cmb_precision[theo]}
-                       for theo in ["camb", "classy"]},
-        kinds.likelihood: {
+        "sampler": cmb_sampler_recommended,
+        "theory": {theo: {"extra_args": cmb_precision[theo]}
+                   for theo in ["camb", "classy"]},
+        "likelihood": {
             "planck_2018_lowl.TT": None,
             "planck_2018_lowl.EE": None,
             "planck_2018_highl_plik.TTTEEE": None,
             "planck_2018_lensing.clik": None}},
     "planck_2018_bk15": {
         "desc": "Planck 2018 (Polarized CMB + lensing) + Bicep/Keck-Array 2015",
-        kinds.sampler: cmb_sampler_recommended,
-        kinds.theory: {theo: {"extra_args": cmb_precision[theo]}
-                       for theo in ["camb", "classy"]},
-        kinds.likelihood: {
+        "sampler": cmb_sampler_recommended,
+        "theory": {theo: {"extra_args": cmb_precision[theo]}
+                   for theo in ["camb", "classy"]},
+        "likelihood": {
             "planck_2018_lowl.TT": None,
             "planck_2018_lowl.EE": None,
             "planck_2018_highl_plik.TTTEEE": None,
@@ -389,10 +389,10 @@ like_cmb: InfoDict = {
             "bicep_keck_2015": None}},
     "planck_2018_CMBmarged_lensing": {
         "desc": "Planck 2018 CMB-marginalized lensing",
-        kinds.sampler: cmb_sampler_recommended,
-        kinds.theory: {theo: {"extra_args": cmb_precision[theo]}
-                       for theo in ["camb", "classy"]},
-        kinds.likelihood: {"planck_2018_lensing.CMBMarged": None}}}
+        "sampler": cmb_sampler_recommended,
+        "theory": {theo: {"extra_args": cmb_precision[theo]}
+                   for theo in ["camb", "classy"]},
+        "likelihood": {"planck_2018_lensing.CMBMarged": None}}}
 
 like_cmb["planck_2018_bk15"]["note"] = like_cmb["planck_2018"]["note"]
 # Add common CMB derived parameters
@@ -412,12 +412,12 @@ for name, m in like_cmb.items():
     # Don't add the derived parameter to the no-CMB case!
     if not m:
         continue
-    if _params not in m:
-        m[_params] = dict()
-    m[_params].update(derived_params)
+    if "params" not in m:
+        m["params"] = dict()
+    m["params"].update(derived_params)
     if "cmbmarged" in name.lower():
-        m[_params].pop("A")
-        m[_params].pop("clamp")
+        m["params"].pop("A")
+        m["params"].pop("clamp")
 # Some more, in case we want to add them at some point, described in
 # https://wiki.cosmos.esa.int/planckpla2015/images/b/b9/Parameter_tag_definitions_2015.pdf
 #    "zstar":       {"latex": r"z_*"},
@@ -443,59 +443,59 @@ like_des: InfoDict = \
     {"(None)": {},
      "des_y1_clustering": {
          "desc": "Galaxy clustering from DES Y1",
-         kinds.theory: {theo: {"extra_args": base_precision[theo]}
-                        for theo in ["camb", "classy"]},
-         kinds.likelihood: {"des_y1.clustering": None}},
+         "theory": {theo: {"extra_args": base_precision[theo]}
+                    for theo in ["camb", "classy"]},
+         "likelihood": {"des_y1.clustering": None}},
      "des_y1_galaxy_galaxy": {
          "desc": "Galaxy-galaxy lensing from DES Y1",
-         kinds.theory: {theo: {"extra_args": base_precision[theo]}
-                        for theo in ["camb", "classy"]},
-         kinds.likelihood: {"des_y1.galaxy_galaxy": None}},
+         "theory": {theo: {"extra_args": base_precision[theo]}
+                    for theo in ["camb", "classy"]},
+         "likelihood": {"des_y1.galaxy_galaxy": None}},
      "des_y1_shear": {
          "desc": "Cosmic shear data from DES Y1",
-         kinds.theory: {theo: {"extra_args": base_precision[theo]}
-                        for theo in ["camb", "classy"]},
-         kinds.likelihood: {"des_y1.shear": None}},
+         "theory": {theo: {"extra_args": base_precision[theo]}
+                    for theo in ["camb", "classy"]},
+         "likelihood": {"des_y1.shear": None}},
      "des_y1_joint": {
          "desc": "Combination of galaxy clustering and weak lensing data from DES Y1",
-         kinds.theory: {theo: {"extra_args": base_precision[theo]}
-                        for theo in ["camb", "classy"]},
-         kinds.likelihood: {"des_y1.joint": None}}}
+         "theory": {theo: {"extra_args": base_precision[theo]}
+                    for theo in ["camb", "classy"]},
+         "likelihood": {"des_y1.joint": None}}}
 
 like_sn: InfoDict = {"(None)": {},
                      "Pantheon": {
                          "desc": "Supernovae data from the Pantheon sample",
-                         kinds.theory: theory,
-                         kinds.likelihood: {"sn.pantheon": None}}}
+                         "theory": theory,
+                         "likelihood": {"sn.pantheon": None}}}
 
 like_H0: InfoDict = \
     {"(None)": {},
      "Riess2018a": {
          "desc": "Local H0 measurement from Riess et al. 2018a (used in Planck 2018)",
-         kinds.theory: theory,
-         kinds.likelihood: {"H0.riess2018a": None}},
+         "theory": theory,
+         "likelihood": {"H0.riess2018a": None}},
      "Riess201903": {
          "desc": "Local H0 measurement from Riess et al. 2019",
-         kinds.theory: theory,
-         kinds.likelihood: {"H0.riess201903": None}},
+         "theory": theory,
+         "likelihood": {"H0.riess201903": None}},
      "Riess2020": {
          "desc": "Local H0 measurement from Riess et al. 2020",
-         kinds.theory: theory,
-         kinds.likelihood: {"H0.riess2020": None}},
+         "theory": theory,
+         "likelihood": {"H0.riess2020": None}},
      "Freedman2020": {
          "desc": "Local H0 measurement from Freedman et al. 2020",
-         kinds.theory: theory,
-         kinds.likelihood: {"H0.freedman2020": None}}}
+         "theory": theory,
+         "likelihood": {"H0.freedman2020": None}}}
 
 # SAMPLERS ###############################################################################
 
 sampler: InfoDict = {
     "MCMC":
         {"desc": "MCMC sampler with covmat learning",
-         kinds.sampler: {"mcmc": {"covmat": "auto"}}},
+         "sampler": {"mcmc": {"covmat": "auto"}}},
     "PolyChord": {
         "desc": "Nested sampler, affine invariant and multi-modal",
-        kinds.sampler: {"polychord": None}}}
+        "sampler": {"polychord": None}}}
 
 # PRESETS ################################################################################
 
@@ -612,8 +612,8 @@ for name, pre in preset.items():
 
 # BASIC INSTALLATION #####################################################################
 install_basic: InfoDict = {
-    kinds.theory: theory,
-    kinds.likelihood: {
+    "theory": theory,
+    "likelihood": {
         "planck_2018_lowl.TT": None,
         "planck_2018_lensing.native": None,
         "bicep_keck_2015": None,
@@ -622,12 +622,12 @@ install_basic: InfoDict = {
         "des_y1.joint": None}}
 
 install_tests = deepcopy(install_basic)
-install_tests[kinds.likelihood].update({"planck_2015_lowl": None,
-                                        "planck_2018_highl_plik.TT_unbinned": None,
-                                        "planck_2018_highl_plik.TT_lite_native": None,
-                                        "planck_2018_highl_CamSpec.TT": None,
-                                        "planck_2018_highl_CamSpec.TT_native": None,
-                                        })
+install_tests["likelihood"].update({"planck_2015_lowl": None,
+                                    "planck_2018_highl_plik.TT_unbinned": None,
+                                    "planck_2018_highl_plik.TT_lite_native": None,
+                                    "planck_2018_highl_CamSpec.TT": None,
+                                    "planck_2018_highl_CamSpec.TT_native": None,
+                                    })
 
 # CONTENTS FOR COMBO-BOXED IN A GUI ######################################################
 

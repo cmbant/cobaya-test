@@ -5,7 +5,7 @@ to make sure it remains up to date.
 
 import os
 
-from cobaya.conventions import _packages_path
+from cobaya.conventions import "packages_path"
 from .common import process_packages_path
 from .conftest import install_test_wrapper
 
@@ -26,7 +26,7 @@ def test_cosmo_docs_likelihood_camb(packages_path, skip_not_installed):
         os.chdir(docs_src_folder)
         lines = open(os.path.join(docs_src_folder, "1_fiducial_Cl.py")).readlines()
         for i, line in enumerate(lines):
-            if line.startswith(_packages_path):
+            if line.startswith("packages_path"):
                 lines[i] = "packages_path = '%s'" % packages_path.strip("\'\"")
         globals_example = {}
         install_test_wrapper(skip_not_installed, exec, "\n".join(lines), globals_example)
