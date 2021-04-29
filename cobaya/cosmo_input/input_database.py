@@ -14,33 +14,28 @@ from copy import deepcopy
 from cobaya.conventions import kinds, _params
 from cobaya.typing import InfoDict
 
-_camb = "camb"
-_classy = "classy"
-_desc = "desc"
-_comment = "note"
-_extra_args = "extra_args"
-_error_msg = "error_msg"
-_none = "(None)"
-
 # Theory codes
-theory: InfoDict = {_camb: None, _classy: None}
+theory: InfoDict = {"camb": None, "classy": None}
 
 # Primordial perturbations
 primordial = {
     'SFSR': {'desc': 'Adiabatic scalar perturbations, power law spectrum',
-             'theory': {'camb': None, 'classy': None}, 'params': {
-            'logA': {'prior': {'min': 1.61, 'max': 3.91},
-                     'ref': {'dist': 'norm', 'loc': 3.05, 'scale': 0.001},
-                     'proposal': 0.001, 'latex': '\\log(10^{10} A_\\mathrm{s})',
-                     'drop': True},
-            'As': {'value': 'lambda logA: 1e-10*np.exp(logA)', 'latex': 'A_\\mathrm{s}'},
-            'ns': {'prior': {'min': 0.8, 'max': 1.2},
-                   'ref': {'dist': 'norm', 'loc': 0.965, 'scale': 0.004},
-                   'proposal': 0.002, 'latex': 'n_\\mathrm{s}'}}},
+             'theory': theory,
+             'params': {
+                 'logA': {'prior': {'min': 1.61, 'max': 3.91},
+                          'ref': {'dist': 'norm', 'loc': 3.05, 'scale': 0.001},
+                          'proposal': 0.001, 'latex': '\\log(10^{10} A_\\mathrm{s})',
+                          'drop': True},
+                 'As': {'value': 'lambda logA: 1e-10*np.exp(logA)',
+                        'latex': 'A_\\mathrm{s}'},
+                 'ns': {'prior': {'min': 0.8, 'max': 1.2},
+                        'ref': {'dist': 'norm', 'loc': 0.965, 'scale': 0.004},
+                        'proposal': 0.002, 'latex': 'n_\\mathrm{s}'}}},
     'SFSR_DESpriors': {
         'desc': 'Adiabatic scalar perturbations, '
                 'power law + running spectrum -- DESpriors',
-        'theory': {'camb': None, 'classy': None}, 'params': {
+        'theory': theory,
+        'params': {
             'As_1e9': {'prior': {'min': 0.5, 'max': 5},
                        'ref': {'dist': 'norm', 'loc': 2.1, 'scale': 0.5},
                        'proposal': 0.25, 'latex': '10^9 A_\\mathrm{s})', 'drop': True,
@@ -51,21 +46,24 @@ primordial = {
                    'proposal': 0.002, 'latex': 'n_\\mathrm{s}'}}},
     'SFSR_run':
         {'desc': 'Adiabatic scalar perturbations, power law + running spectrum',
-         'theory': {'camb': None, 'classy': None}, 'params': {
-            'logA': {'prior': {'min': 1.61, 'max': 3.91},
-                     'ref': {'dist': 'norm', 'loc': 3.05, 'scale': 0.001},
-                     'proposal': 0.001, 'latex': '\\log(10^{10} A_\\mathrm{s})',
-                     'drop': True},
-            'As': {'value': 'lambda logA: 1e-10*np.exp(logA)', 'latex': 'A_\\mathrm{s}'},
-            'ns': {'prior': {'min': 0.8, 'max': 1.2},
-                   'ref': {'dist': 'norm', 'loc': 0.965, 'scale': 0.004},
-                   'proposal': 0.002, 'latex': 'n_\\mathrm{s}'},
-            'nrun': {'prior': {'min': -1, 'max': 1},
-                     'ref': {'dist': 'norm', 'loc': 0, 'scale': 0.005}, 'proposal': 0.001,
-                     'latex': 'n_\\mathrm{run}'}}},
+         'theory': theory,
+         'params': {
+             'logA': {'prior': {'min': 1.61, 'max': 3.91},
+                      'ref': {'dist': 'norm', 'loc': 3.05, 'scale': 0.001},
+                      'proposal': 0.001, 'latex': '\\log(10^{10} A_\\mathrm{s})',
+                      'drop': True},
+             'As': {'value': 'lambda logA: 1e-10*np.exp(logA)', 'latex': 'A_\\mathrm{s}'},
+             'ns': {'prior': {'min': 0.8, 'max': 1.2},
+                    'ref': {'dist': 'norm', 'loc': 0.965, 'scale': 0.004},
+                    'proposal': 0.002, 'latex': 'n_\\mathrm{s}'},
+             'nrun': {'prior': {'min': -1, 'max': 1},
+                      'ref': {'dist': 'norm', 'loc': 0, 'scale': 0.005},
+                      'proposal': 0.001,
+                      'latex': 'n_\\mathrm{run}'}}},
     'SFSR_runrun': {
         'desc': 'Adiabatic scalar perturbations, power law + 2nd-order running spectrum',
-        'theory': {'camb': None, 'classy': None}, 'params': {
+        'theory': theory,
+        'params': {
             'logA': {'prior': {'min': 1.61, 'max': 3.91},
                      'ref': {'dist': 'norm', 'loc': 3.05, 'scale': 0.001},
                      'proposal': 0.001, 'latex': '\\log(10^{10} A_\\mathrm{s})',
@@ -120,9 +118,9 @@ primordial = {
 # Geometry
 geometry = {
     'flat': {'desc': 'Flat FLRW universe',
-             'theory': {'camb': None, 'classy': None}},
+             'theory': theory},
     'omegak': {'desc': 'FLRW model with varying curvature (prior on Omega_k)',
-               'theory': {'camb': None, 'classy': None},
+               'theory': theory,
                'params': {'omegak': {'prior': {'min': -0.3, 'max': 0.3},
                                      'ref': {'dist': 'norm', 'loc': -0.009,
                                              'scale': 0.001},
@@ -133,13 +131,14 @@ H0_min, H0_max = 20, 100
 
 hubble = {
     'H': {'desc': 'Hubble parameter',
-          'theory': {'camb': None, 'classy': None},
+          'theory': theory,
           'params': {'H0': {'prior': {'min': H0_min, 'max': H0_max},
                             'ref': {'dist': 'norm', 'loc': 67, 'scale': 2}, 'proposal': 2,
                             'latex': 'H_0'}}},
     'H_DESpriors': {
         'desc': 'Hubble parameter (reduced range for DES and lensing-only constraints)',
-        'theory': {'camb': None, 'classy': None}, 'params': {
+        'theory': theory,
+        'params': {
             'H0': {'prior': {'min': 55, 'max': 91},
                    'ref': {'dist': 'norm', 'loc': 67, 'scale': 2}, 'proposal': 2,
                    'latex': 'H_0'}}},
@@ -178,7 +177,7 @@ nu_mass_fac = 94.0708
 matter: InfoDict = {
     'omegab_h2, omegac_h2': {
         'desc': 'Flat prior on Omega*h^2 for baryons and cold dark matter',
-        'theory': {'camb': None, 'classy': None},
+        'theory': theory,
         'params': {
             'omegabh2': {'prior': {'min': 0.005, 'max': 0.1},
                          'ref': {'dist': 'norm', 'loc': 0.0224, 'scale': 0.0001},
@@ -189,7 +188,7 @@ matter: InfoDict = {
             'omegam': {'latex': '\\Omega_\\mathrm{m}'}}},
     'Omegab, Omegam':
         {'desc': 'Flat prior on Omega for baryons and total matter',
-         'theory': {'camb': None, 'classy': None},
+         'theory': theory,
          'params': {
              'omegab':
                  {'prior': {'min': 0.03, 'max': 0.07},
@@ -219,11 +218,13 @@ for m in matter.values():
 neutrinos: InfoDict = {
     'one_heavy_planck':
         {'desc': 'Two massless nu and one with m=0.06. Neff=3.046',
-         'theory': {'camb': {
-             'extra_args': {'num_massive_neutrinos': 1, 'nnu': 3.046},
-             'params': {'mnu': 0.06}}, 'classy': {
-             'extra_args': {'N_ncdm': 1, 'N_ur': 2.0328},
-             'params': {'m_ncdm': {'value': 0.06, 'renames': 'mnu'}}}}},
+         'theory': {
+             'camb': {
+                 'extra_args': {'num_massive_neutrinos': 1, 'nnu': 3.046},
+                 'params': {'mnu': 0.06}},
+             'classy': {
+                 'extra_args': {'N_ncdm': 1, 'N_ur': 2.0328},
+                 'params': {'m_ncdm': {'value': 0.06, 'renames': 'mnu'}}}}},
     'varying_mnu':
         {'desc': "Varying total mass of 3 degenerate nu's, with N_eff=3.046",
          'theory': {
@@ -241,25 +242,28 @@ neutrinos: InfoDict = {
                                  'proposal': 0.01, 'latex': 'm_\\nu'},
                       'mnu': {'derived': 'lambda m_ncdm: 3 * m_ncdm',
                               'latex': '\\sum m_\\nu'}}}}},
-    'varying_Neff': {'desc': 'Varying Neff with two massless nu and one with m=0.06',
-                     'theory':
-                         {'camb':
-                              {'extra_args': {'num_massive_neutrinos': 1},
-                               'params': {'mnu': 0.06, 'nnu': {
-                                   'prior': {'min': 0.05, 'max': 10},
-                                   'ref': {'dist': 'norm', 'loc': 3.046,
-                                           'scale': 0.05}, 'proposal': 0.05,
-                                   'latex': 'N_\\mathrm{eff}'}}},
-                          'classy':
-                              {'extra_args': {'N_ncdm': 1},
-                               'params': {
-                                   'm_ncdm': {'value': 0.06, 'renames': 'mnu'},
-                                   'N_ur': {'prior': {'min': 0.0001, 'max': 9},
-                                            'ref': {'dist': 'norm', 'loc': 2.0328,
-                                                    'scale': 0.05}, 'proposal': 0.05,
-                                            'latex': 'N_\\mathrm{ur}'},
-                                   'nnu': {'derived': 'lambda Neff: Neff',
-                                           'latex': 'N_\\mathrm{eff}'}}}}},
+    'varying_Neff':
+        {'desc': 'Varying Neff with two massless nu and one with m=0.06',
+         'theory': {
+             'camb': {
+                 'extra_args': {'num_massive_neutrinos': 1},
+                 'params': {
+                     'mnu': 0.06,
+                     'nnu': {
+                         'prior': {'min': 0.05, 'max': 10},
+                         'ref': {'dist': 'norm', 'loc': 3.046, 'scale': 0.05},
+                         'proposal': 0.05,
+                         'latex': 'N_\\mathrm{eff}'}}},
+             'classy':
+                 {'extra_args': {'N_ncdm': 1},
+                  'params': {
+                      'm_ncdm': {'value': 0.06, 'renames': 'mnu'},
+                      'N_ur': {'prior': {'min': 0.0001, 'max': 9},
+                               'ref': {'dist': 'norm', 'loc': 2.0328,
+                                       'scale': 0.05}, 'proposal': 0.05,
+                               'latex': 'N_\\mathrm{ur}'},
+                      'nnu': {'derived': 'lambda Neff: Neff',
+                              'latex': 'N_\\mathrm{eff}'}}}}},
     'varying_mnu_Neff':
         {'desc': "Varying Neff and total mass of 3 degenerate nu's",
          'theory':
@@ -279,7 +283,7 @@ neutrinos: InfoDict = {
 dark_energy: InfoDict = \
     {'lambda':
          {'desc': 'Cosmological constant (w=-1)',
-          'theory': {'camb': None, 'classy': None},
+          'theory': theory,
           'params': {'omegal': {'latex': '\\Omega_\\Lambda'}}},
      'de_w':
          {'desc': 'Varying constant eq of state',
@@ -309,76 +313,74 @@ bbn_derived_camb: InfoDict = {'YpBBN': {'latex': 'Y_P^\\mathrm{BBN}'},
                                         'latex': '10^5 \\mathrm{D}/\\mathrm{H}'}}
 bbn = {'consistency':
            {'desc': 'Primordial Helium fraction inferred from BBN consistency',
-            'theory':
-                {'camb': {
-                    'params': {'YpBBN': {'latex': 'Y_P^\\mathrm{BBN}'},
-                               'DHBBN': {'derived': 'lambda DH: 10**5*DH',
-                                         'latex': '10^5 \\mathrm{D}/\\mathrm{H}'}}},
-                    'classy': None},
+            'theory': {
+                'camb': {'params': bbn_derived_camb},
+                'classy': None},
             'params': {'yheused': {'latex': 'Y_\\mathrm{P}'}}},
        'YHe_des_y1':
            {'desc': 'Fixed Y_P = 0.245341 (used in DES Y1)',
-            'theory': {'camb': None, 'classy': None},
+            'theory': theory,
             'params': {'yhe': 0.245341}},
        'YHe':
            {'desc': 'Varying primordial Helium fraction',
-            'theory': {'camb': None, 'classy': None},
+            'theory': theory,
             'params': {
                 'yhe': {'prior': {'min': 0.1, 'max': 0.5},
                         'ref': {'dist': 'norm', 'loc': 0.237, 'scale': 0.006},
                         'proposal': 0.006, 'latex': 'Y_\\mathrm{P}'}}}}
 
 # Reionization
-reionization = \
-    {'std': {'desc': 'Standard reio, lasting delta_z=0.5',
-             'theory': {'camb': None, 'classy': None},
-             'params': {
-                 'tau': {'prior': {'min': 0.01, 'max': 0.8},
-                         'ref': {'dist': 'norm', 'loc': 0.055, 'scale': 0.006},
-                         'proposal': 0.003,
-                         'latex': '\\tau_\\mathrm{reio}'},
-                 'zrei': {'latex': 'z_\\mathrm{re}'}}},
-     'gauss_prior': {
-         'desc': 'Standard reio, lasting delta_z=0.5, gaussian prior around tau=0.07',
-         'theory': {'camb': None, 'classy': None},
-         'params': {
-             'tau': {'prior': {'dist': 'norm', 'loc': 0.07, 'scale': 0.02},
-                     'ref': {'dist': 'norm', 'loc': 0.07, 'scale': 0.01},
-                     'proposal': 0.005,
-                     'latex': '\\tau_\\mathrm{reio}'},
-             'zrei': {'latex': 'z_\\mathrm{re}'}}},
-     'irrelevant': {
-         'desc': 'Irrelevant (NB: only valid for non-CMB or CMB-marged datasets!)',
-         'theory': {'camb': None, 'classy': None},
-         'params': {}}}
+reionization = {
+    'std': {
+        'desc': 'Standard reio, lasting delta_z=0.5',
+        'theory': theory,
+        'params': {
+            'tau': {'prior': {'min': 0.01, 'max': 0.8},
+                    'ref': {'dist': 'norm', 'loc': 0.055, 'scale': 0.006},
+                    'proposal': 0.003,
+                    'latex': '\\tau_\\mathrm{reio}'},
+            'zrei': {'latex': 'z_\\mathrm{re}'}}},
+    'gauss_prior': {
+        'desc': 'Standard reio, lasting delta_z=0.5, gaussian prior around tau=0.07',
+        'theory': theory,
+        'params': {
+            'tau': {'prior': {'dist': 'norm', 'loc': 0.07, 'scale': 0.02},
+                    'ref': {'dist': 'norm', 'loc': 0.07, 'scale': 0.01},
+                    'proposal': 0.005,
+                    'latex': '\\tau_\\mathrm{reio}'},
+            'zrei': {'latex': 'z_\\mathrm{re}'}}},
+    'irrelevant': {
+        'desc': 'Irrelevant (NB: only valid for non-CMB or CMB-marged datasets!)',
+        'theory': theory,
+        'params': {}}}
 
 # EXPERIMENTS ############################################################################
-base_precision: InfoDict = {_camb: {"halofit_version": "mead"},
-                            _classy: {"non linear": "hmcode", "hmcode_min_k_max": 20}}
+base_precision: InfoDict = {"camb": {"halofit_version": "mead"},
+                            "classy": {"non linear": "hmcode", "hmcode_min_k_max": 20}}
 cmb_precision = deepcopy(base_precision)
-cmb_precision[_camb].update({"bbn_predictor": "PArthENoPE_880.2_standard.dat",
-                             "lens_potential_accuracy": 1})
+cmb_precision["camb"].update({"bbn_predictor": "PArthENoPE_880.2_standard.dat",
+                              "lens_potential_accuracy": 1})
 cmb_sampler_recommended: InfoDict = {"mcmc": {
     "drag": True, "oversample_power": 0.4, "proposal_scale": 1.9}}
 
 like_cmb: InfoDict = {
-    _none: {},
+    "(None)": {},
     "planck_2018": {
-        _desc: "Planck 2018 (Polarized CMB + lensing)",
-        _comment: None,
+        "desc": "Planck 2018 (Polarized CMB + lensing)",
+        "note": None,
         kinds.sampler: cmb_sampler_recommended,
-        kinds.theory: {theo: {_extra_args: cmb_precision[theo]}
-                       for theo in [_camb, _classy]},
+        kinds.theory: {theo: {"extra_args": cmb_precision[theo]}
+                       for theo in ["camb", "classy"]},
         kinds.likelihood: {
             "planck_2018_lowl.TT": None,
             "planck_2018_lowl.EE": None,
             "planck_2018_highl_plik.TTTEEE": None,
             "planck_2018_lensing.clik": None}},
     "planck_2018_bk15": {
-        _desc: "Planck 2018 (Polarized CMB + lensing) + Bicep/Keck-Array 2015",
+        "desc": "Planck 2018 (Polarized CMB + lensing) + Bicep/Keck-Array 2015",
         kinds.sampler: cmb_sampler_recommended,
-        kinds.theory: {theo: {_extra_args: cmb_precision[theo]}
-                       for theo in [_camb, _classy]},
+        kinds.theory: {theo: {"extra_args": cmb_precision[theo]}
+                       for theo in ["camb", "classy"]},
         kinds.likelihood: {
             "planck_2018_lowl.TT": None,
             "planck_2018_lowl.EE": None,
@@ -386,13 +388,13 @@ like_cmb: InfoDict = {
             "planck_2018_lensing.clik": None,
             "bicep_keck_2015": None}},
     "planck_2018_CMBmarged_lensing": {
-        _desc: "Planck 2018 CMB-marginalized lensing",
+        "desc": "Planck 2018 CMB-marginalized lensing",
         kinds.sampler: cmb_sampler_recommended,
-        kinds.theory: {theo: {_extra_args: cmb_precision[theo]}
-                       for theo in [_camb, _classy]},
+        kinds.theory: {theo: {"extra_args": cmb_precision[theo]}
+                       for theo in ["camb", "classy"]},
         kinds.likelihood: {"planck_2018_lensing.CMBMarged": None}}}
 
-like_cmb["planck_2018_bk15"][_comment] = like_cmb["planck_2018"][_comment]
+like_cmb["planck_2018_bk15"]["note"] = like_cmb["planck_2018"]["note"]
 # Add common CMB derived parameters
 derived_params = {'sigma8': {'latex': '\\sigma_8'},
                   's8h5': {'derived': 'lambda sigma8, H0: sigma8*(H0*1e-2)**(-0.5)',
@@ -430,69 +432,69 @@ for name, m in like_cmb.items():
 #    "thetaeq":     {"latex": r"100\theta_\mathrm{eq}"},
 #    "thetarseq":   {"latex": r"100\theta_\mathrm{s,eq}"},
 
-like_bao = {_none: {},
+like_bao = {"(None)": {},
             'BAO_planck_2018': {
                 'desc': 'Baryon acoustic oscillation data from DR12, MGS and 6DF',
-                'theory': {'camb': None, 'classy': None},
+                'theory': theory,
                 'likelihood': {'bao.sixdf_2011_bao': None, 'bao.sdss_dr7_mgs': None,
                                'bao.sdss_dr12_consensus_bao': None}}}
 
 like_des: InfoDict = \
-    {_none: {},
+    {"(None)": {},
      "des_y1_clustering": {
-         _desc: "Galaxy clustering from DES Y1",
-         kinds.theory: {theo: {_extra_args: base_precision[theo]}
-                        for theo in [_camb, _classy]},
+         "desc": "Galaxy clustering from DES Y1",
+         kinds.theory: {theo: {"extra_args": base_precision[theo]}
+                        for theo in ["camb", "classy"]},
          kinds.likelihood: {"des_y1.clustering": None}},
      "des_y1_galaxy_galaxy": {
-         _desc: "Galaxy-galaxy lensing from DES Y1",
-         kinds.theory: {theo: {_extra_args: base_precision[theo]}
-                        for theo in [_camb, _classy]},
+         "desc": "Galaxy-galaxy lensing from DES Y1",
+         kinds.theory: {theo: {"extra_args": base_precision[theo]}
+                        for theo in ["camb", "classy"]},
          kinds.likelihood: {"des_y1.galaxy_galaxy": None}},
      "des_y1_shear": {
-         _desc: "Cosmic shear data from DES Y1",
-         kinds.theory: {theo: {_extra_args: base_precision[theo]}
-                        for theo in [_camb, _classy]},
+         "desc": "Cosmic shear data from DES Y1",
+         kinds.theory: {theo: {"extra_args": base_precision[theo]}
+                        for theo in ["camb", "classy"]},
          kinds.likelihood: {"des_y1.shear": None}},
      "des_y1_joint": {
-         _desc: "Combination of galaxy clustering and weak lensing data from DES Y1",
-         kinds.theory: {theo: {_extra_args: base_precision[theo]}
-                        for theo in [_camb, _classy]},
+         "desc": "Combination of galaxy clustering and weak lensing data from DES Y1",
+         kinds.theory: {theo: {"extra_args": base_precision[theo]}
+                        for theo in ["camb", "classy"]},
          kinds.likelihood: {"des_y1.joint": None}}}
 
-like_sn: InfoDict = {_none: {},
+like_sn: InfoDict = {"(None)": {},
                      "Pantheon": {
-                         _desc: "Supernovae data from the Pantheon sample",
-                         kinds.theory: {_camb: None, _classy: None},
+                         "desc": "Supernovae data from the Pantheon sample",
+                         kinds.theory: theory,
                          kinds.likelihood: {"sn.pantheon": None}}}
 
 like_H0: InfoDict = \
-    {_none: {},
+    {"(None)": {},
      "Riess2018a": {
-         _desc: "Local H0 measurement from Riess et al. 2018a (used in Planck 2018)",
-         kinds.theory: {_camb: None, _classy: None},
+         "desc": "Local H0 measurement from Riess et al. 2018a (used in Planck 2018)",
+         kinds.theory: theory,
          kinds.likelihood: {"H0.riess2018a": None}},
      "Riess201903": {
-         _desc: "Local H0 measurement from Riess et al. 2019",
-         kinds.theory: {_camb: None, _classy: None},
+         "desc": "Local H0 measurement from Riess et al. 2019",
+         kinds.theory: theory,
          kinds.likelihood: {"H0.riess201903": None}},
      "Riess2020": {
-         _desc: "Local H0 measurement from Riess et al. 2020",
-         kinds.theory: {_camb: None, _classy: None},
+         "desc": "Local H0 measurement from Riess et al. 2020",
+         kinds.theory: theory,
          kinds.likelihood: {"H0.riess2020": None}},
      "Freedman2020": {
-         _desc: "Local H0 measurement from Freedman et al. 2020",
-         kinds.theory: {_camb: None, _classy: None},
+         "desc": "Local H0 measurement from Freedman et al. 2020",
+         kinds.theory: theory,
          kinds.likelihood: {"H0.freedman2020": None}}}
 
 # SAMPLERS ###############################################################################
 
 sampler: InfoDict = {
     "MCMC":
-        {_desc: "MCMC sampler with covmat learning",
+        {"desc": "MCMC sampler with covmat learning",
          kinds.sampler: {"mcmc": {"covmat": "auto"}}},
     "PolyChord": {
-        _desc: "Nested sampler, affine invariant and multi-modal",
+        "desc": "Nested sampler, affine invariant and multi-modal",
         kinds.sampler: {"polychord": None}}}
 
 # PRESETS ################################################################################
@@ -509,61 +511,61 @@ planck_base_model = {
 default_sampler = {"sampler": "MCMC"}
 
 preset: InfoDict = dict([
-    [_none, {_desc: "(No preset chosen)"}],
+    ["(None)", {"desc": "(No preset chosen)"}],
     # Pure CMB #######################################################
     ["planck_2018_camb", {
-        _desc: "Planck 2018 with CAMB",
-        "theory": _camb,
+        "desc": "Planck 2018 with CAMB",
+        "theory": "camb",
         "like_cmb": "planck_2018"}],
     ["planck_2018_classy", {
-        _desc: "Planck 2018 with CLASS",
-        "theory": _classy,
+        "desc": "Planck 2018 with CLASS",
+        "theory": "classy",
         "like_cmb": "planck_2018"}],
     ["planck_2018_bicep_camb", {
-        _desc: "Planck 2018 + BK15 (with tensor modes) with CAMB",
-        "theory": _camb,
+        "desc": "Planck 2018 + BK15 (with tensor modes) with CAMB",
+        "theory": "camb",
         "primordial": "SFSR_t",
         "like_cmb": "planck_2018_bk15"}],
     ["planck_2018_bicep_classy", {
-        _desc: "Planck 2018 + BK15 (with tensor modes) with CLASS",
-        "theory": _classy,
+        "desc": "Planck 2018 + BK15 (with tensor modes) with CLASS",
+        "theory": "classy",
         "primordial": "SFSR_t",
         "like_cmb": "planck_2018_bk15"}],
     # CMB+BAO ######################################################
     ["planck_2018_BAO_camb", {
-        _desc: "Planck 2018 + BAO with CAMB",
-        "theory": _camb,
+        "desc": "Planck 2018 + BAO with CAMB",
+        "theory": "camb",
         "like_cmb": "planck_2018",
         "like_bao": "BAO_planck_2018"}],
     ["planck_2018_BAO_classy", {
-        _desc: "Planck 2018 + BAO with CLASS",
-        "theory": _classy,
+        "desc": "Planck 2018 + BAO with CLASS",
+        "theory": "classy",
         "like_cmb": "planck_2018",
         "like_bao": "BAO_planck_2018"}],
     # CMB+BAO+SN ###################################################
     ["planck_2018_BAO_SN_camb", {
-        _desc: "Planck 2018 + BAO + SN with CAMB",
-        "theory": _camb,
+        "desc": "Planck 2018 + BAO + SN with CAMB",
+        "theory": "camb",
         "like_cmb": "planck_2018",
         "like_bao": "BAO_planck_2018",
         "like_sn": "Pantheon"}],
     ["planck_2018_BAO_SN_classy", {
-        _desc: "Planck 2018 + BAO + SN with CLASS",
-        "theory": _classy,
+        "desc": "Planck 2018 + BAO + SN with CLASS",
+        "theory": "classy",
         "like_cmb": "planck_2018",
         "like_bao": "BAO_planck_2018",
         "like_sn": "Pantheon"}],
     # CMB+DES+BAO+SN ###################################################
     ["planck_2018_DES_BAO_SN_camb", {
-        _desc: "Planck 2018 + DESjoint + BAO + SN with CAMB",
-        "theory": _camb,
+        "desc": "Planck 2018 + DESjoint + BAO + SN with CAMB",
+        "theory": "camb",
         "like_cmb": "planck_2018",
         "like_bao": "BAO_planck_2018",
         "like_des": "des_y1_joint",
         "like_sn": "Pantheon"}],
     ["planck_2018_DES_BAO_SN_classy", {
-        _desc: "Planck 2018 + DESjoint + BAO + SN with CLASS",
-        "theory": _classy,
+        "desc": "Planck 2018 + DESjoint + BAO + SN with CLASS",
+        "theory": "classy",
         "like_cmb": "planck_2018",
         "like_bao": "BAO_planck_2018",
         "like_des": "des_y1_joint",
@@ -571,22 +573,22 @@ preset: InfoDict = dict([
 ])
 
 # Add planck baseline model
-for pre in list(preset.values()):
+for pre in preset.values():
     pre.update(
         {field: value for field, value in planck_base_model.items() if field not in pre})
     pre.update(default_sampler)
 
 # Lensing-only ###################################################
 preset.update({
-    _none: {_desc: "(No preset chosen)"},
+    "(None)": {"desc": "(No preset chosen)"},
     "planck_2018_DES_lensingonly_camb": {
-        _desc: "Planck 2018 + DES Y1 lensing-only with CAMB",
-        "theory": _camb,
+        "desc": "Planck 2018 + DES Y1 lensing-only with CAMB",
+        "theory": "camb",
         "like_cmb": "planck_2018_CMBmarged_lensing",
         "like_des": "des_y1_shear"},
     "planck_2018_DES_lensingonly_classy": {
-        _desc: "Planck 2018 + DES Y1 lensing-only with CLASS",
-        "theory": _classy,
+        "desc": "Planck 2018 + DES Y1 lensing-only with CLASS",
+        "theory": "classy",
         "like_cmb": "planck_2018_CMBmarged_lensing",
         "like_des": "des_y1_shear"}})
 
@@ -610,7 +612,7 @@ for name, pre in preset.items():
 
 # BASIC INSTALLATION #####################################################################
 install_basic: InfoDict = {
-    kinds.theory: {_camb: None, _classy: None},
+    kinds.theory: theory,
     kinds.likelihood: {
         "planck_2018_lowl.TT": None,
         "planck_2018_lensing.native": None,
