@@ -116,7 +116,7 @@ script:
     fi
   # mpi tests [not sure why it hangs in py3.6]
   - if [[ "$GCC_VERSION" != "6" ]]; then
-    mpiexec -np 2 --mca orte_base_help_aggregate 0 --mca btl ^openib --oversubscribe coverage run --parallel-mode -m pytest -x -m mpi tests/ --no-flaky-report ;
+    mpiexec -np 2 --mca orte_base_help_aggregate 0 --mca btl ^openib --oversubscribe coverage run --parallel-mode -m pytest -s -x -m mpi tests/ --no-flaky-report ;
     fi;
   - mkdir covers; mv .coverage.* covers; ls -ltra covers
   - pytest tests/ --cov -v -s -k "cosmo" --forked --skip-not-installed --no-flaky-report
