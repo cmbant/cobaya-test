@@ -351,6 +351,9 @@ class SampleCollection(BaseCollection):
     def values(self) -> np.ndarray:
         return self.data.to_numpy()
 
+    def to_numpy(self, dtype=None, copy=False) -> np.ndarray:
+        return self.data.to_numpy(copy=copy, dtype=dtype)
+
     def _copy(self, data=None) -> 'SampleCollection':
         """
         Returns a copy of the collection.
@@ -388,16 +391,14 @@ class SampleCollection(BaseCollection):
         The estimate of the mean in this case is unstable; use carefully.
         """
         if pweight:
-            logps = -self[OutPar.minuslogpost][first:last].values.copy()
+            logps = -self[OutPar.minuslogpost][first:last].to_numpy(copy=True)
             logps -= max(logps)
             weights = np.exp(logps)
         else:
-            weights = self[OutPar.weight][first:last].values
-        return np.average(
-            self[list(self.sampled_params) +
-                 (list(self.derived_params) if derived else [])]
-            [first:last].T,
-            weights=weights, axis=-1)
+            weights = self[OutPar.weight][first:last].to_numpy()
+        return np.average(self[list(self.sampled_params) +
+                               (list(self.derived_params) if derived else [])]
+                          [first:last].T, weights=weights, axis=-1)
 
     def cov(self, first=None, last=None, derived=False, pweight=False):
         """
@@ -409,12 +410,12 @@ class SampleCollection(BaseCollection):
         The estimate of the covariance matrix in this case is unstable; use carefully.
         """
         if pweight:
-            logps = -self[OutPar.minuslogpost][first:last].values.copy()
+            logps = -self[OutPar.minuslogpost][first:last].to_numpy(copy=True)
             logps -= max(logps)
             weights = np.exp(logps)
             kwarg = "aweights"
         else:
-            weights = self[OutPar.weight][first:last].values
+            weights = self[OutPar.weight][first:last].to_numpy()
             kwarg = "fweights" if np.allclose(np.round(weights), weights) else "aweights"
         weights_kwarg = {kwarg: weights}
         return np.atleast_2d(np.cov(
@@ -436,8 +437,8 @@ class SampleCollection(BaseCollection):
         try:
             if hasattr(WeightedSamples, "thin_indices_and_weights"):
                 unique, counts = \
-                    WeightedSamples.thin_indices_and_weights(thin,
-                                                             self[OutPar.weight].values)
+                    WeightedSamples.thin_indices_and_weights(
+                        thin, self[OutPar.weight].to_numpy())
             else:
                 raise LoggedError(self.log, "Thinning requires GetDist 1.2+", )
         except WeightedSampleError as e:
@@ -618,8 +619,8 @@ class OnePoint(SampleCollection):
             return self.data.values[0, self.data.columns.get_loc(columns)]
         else:
             try:
-                return self.data.values[
-                    0, [self.data.columns.get_loc(c) for c in columns]]
+                return self.data.values[0,
+                                        [self.data.columns.get_loc(c) for c in columns]]
             except KeyError:
                 raise ValueError("Some of the indices are not valid columns.")
 

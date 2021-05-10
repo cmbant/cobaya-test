@@ -138,16 +138,16 @@ class mcmc(CovmatSampler):
         # NB: if resuming but nothing was written (burn-in not finished): re-start
         if self.output.is_resuming() and len(self.collection):
             initial_point = (self.collection[self.collection.sampled_params]
-                .iloc[len(self.collection) - 1]).values.copy()
+                .iloc[len(self.collection) - 1]).to_numpy(copy=True)
             results = LogPosterior(
                 logpost=-(self.collection[OutPar.minuslogpost]
-                          .iloc[len(self.collection) - 1].copy()),
+                          .iloc[len(self.collection) - 1].to_numpy(copy=True)),
                 logpriors=-(self.collection[self.collection.minuslogprior_names]
-                            .iloc[len(self.collection) - 1].copy()),
+                            .iloc[len(self.collection) - 1].to_numpy(copy=True)),
                 loglikes=-0.5 * (self.collection[self.collection.chi2_names]
-                                 .iloc[len(self.collection) - 1].copy()),
+                                 .iloc[len(self.collection) - 1].to_numpy(copy=True)),
                 derived=(self.collection[self.collection.derived_params]
-                         .iloc[len(self.collection) - 1].values.copy()),
+                         .iloc[len(self.collection) - 1].to_numpy(copy=True)),
             )
         else:
             # NB: max_tries adjusted to dim instead of #cycles (blocking not computed yet)
@@ -430,28 +430,23 @@ class mcmc(CovmatSampler):
         """
         # Prepare starting and ending points *in the SLOW subspace*
         # "start_" and "end_" mean here the extremes in the SLOW subspace
-        start_slow_point = self.current_point.values.copy()
-        start_slow_logpost = self.current_point.logpost
-        end_slow_point = start_slow_point.copy()
-        self.proposer.get_proposal_slow(end_slow_point)
-        self.log.debug("Proposed slow end-point: %r", end_slow_point)
+        current_start_point = self.current_point.values
+        current_start_logpost = self.current_point.logpost
+        current_end_point = current_start_point.copy()
+        self.proposer.get_proposal_slow(current_end_point)
+        self.log.debug("Proposed slow end-point: %r", current_end_point)
         # Save derived parameters of delta_slow jump, in case I reject all the dragging
         # steps but accept the move in the slow direction only
-        end_slow = self.model.logposterior(end_slow_point)
-        if end_slow.logpost == -np.inf:
+        current_end = self.model.logposterior(current_end_point)
+        if current_end.logpost == -np.inf:
             self.current_point.weight += 1
             return False
-        # trackers of the dragging
-        current_start_point = start_slow_point
-        current_end_point = end_slow_point
-        current_start_logpost = start_slow_logpost
-        current_end = end_slow
         # accumulators for the "dragging" probabilities to be metropolis-tested
         # at the end of the interpolation
-        start_drag_logpost_acc = start_slow_logpost
-        end_drag_logpost_acc = end_slow.logpost
+        start_drag_logpost_acc = current_start_logpost
+        end_drag_logpost_acc = current_end.logpost
         # alloc mem
-        delta_fast = np.zeros(len(current_start_point))
+        delta_fast = np.empty(len(current_start_point))
         # start dragging
         for i_step in range(1, 1 + self.drag_interp_steps):
             self.log.debug("Dragging step: %d", i_step)
@@ -460,15 +455,16 @@ class mcmc(CovmatSampler):
             self.proposer.get_proposal_fast(delta_fast)
             self.log.debug("Proposed fast step delta: %r", delta_fast)
             proposal_start_point = current_start_point + delta_fast
-            proposal_end_point = current_end_point + delta_fast
             # get the new extremes for the interpolated probability
             # (reject if any of them = -inf; avoid evaluating both if just one fails)
             # Force the computation of the (slow blocks) derived params at the starting
             # point, but discard them, since they contain the starting point's fast ones,
             # not used later -- save the end point's ones.
-            proposal_start_logpost = self.model.logposterior(proposal_start_point).logpost
+            proposal_start_logpost = self.model.logposterior(
+                proposal_start_point, return_derived=False).logpost
 
             if proposal_start_logpost > -np.inf:
+                proposal_end_point = current_end_point + delta_fast
                 proposal_end = self.model.logposterior(proposal_end_point)
 
                 if proposal_end.logpost > -np.inf:
