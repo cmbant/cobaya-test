@@ -137,18 +137,17 @@ class mcmc(CovmatSampler):
         # we may be saving the initial state of some block.
         # NB: if resuming but nothing was written (burn-in not finished): re-start
         if self.output.is_resuming() and len(self.collection):
+            last = len(self.collection) - 1
             initial_point = (self.collection[self.collection.sampled_params]
-                .iloc[len(self.collection) - 1]).to_numpy(copy=True)
+                .iloc[last]).to_numpy(copy=True)
             results = LogPosterior(
-                logpost=-(self.collection[OutPar.minuslogpost]
-                          .iloc[len(self.collection) - 1].to_numpy(copy=True)),
+                logpost=-self.collection[OutPar.minuslogpost].iloc[last],
                 logpriors=-(self.collection[self.collection.minuslogprior_names]
-                            .iloc[len(self.collection) - 1].to_numpy(copy=True)),
+                            .iloc[last].to_numpy(copy=True)),
                 loglikes=-0.5 * (self.collection[self.collection.chi2_names]
-                                 .iloc[len(self.collection) - 1].to_numpy(copy=True)),
-                derived=(self.collection[self.collection.derived_params]
-                         .iloc[len(self.collection) - 1].to_numpy(copy=True)),
-            )
+                                 .iloc[last].to_numpy(copy=True)),
+                derived=(self.collection[self.collection.derived_params].iloc[last]
+                         .to_numpy(copy=True)))
         else:
             # NB: max_tries adjusted to dim instead of #cycles (blocking not computed yet)
             self.max_tries.set_scale(self.model.prior.d())
