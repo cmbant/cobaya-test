@@ -451,15 +451,15 @@ class Model(HasLogger):
         ignored in favor of the full prior, ensuring some randomness for all parameters
         (useful e.g. to prevent caching when measuring speeds).
 
-        Returns (point, logpost, logpriors, loglikes, derived)
+        Returns (point, LogPosterior(logpost, logpriors, loglikes, derived))
         """
         for loop in range(max(1, max_tries // self.prior.d())):
             initial_point = self.prior.reference(max_tries=max_tries,
                                                  ignore_fixed=ignore_fixed_ref,
                                                  warn_if_no_ref=not loop,
                                                  random_state=random_state)
-            logpost, logpriors, loglikes, derived = self.logposterior(initial_point)
-            if logpost != -np.inf:
+            results = self.logposterior(initial_point)
+            if results.logpost != -np.inf:
                 break
         else:
             if self.prior.reference_is_pointlike():
@@ -468,7 +468,7 @@ class Model(HasLogger):
                                             "or a pdf.")
             raise LoggedError(self.log, "Could not find random point giving finite "
                                         "posterior after %g tries", max_tries)
-        return initial_point, logpost, logpriors, loglikes, derived
+        return initial_point, results
 
     def dump_timing(self):
         """

@@ -20,6 +20,7 @@ from cobaya.conventions import OutPar, minuslogprior_names, chi2_names, \
     derived_par_name_separator
 from cobaya.tools import load_DataFrame
 from cobaya.log import LoggedError, HasLogger, NoLogging
+from cobaya.model import LogPosterior
 
 # Suppress getdist output
 chains.print_load_details = False
@@ -74,7 +75,7 @@ class BaseCollection(HasLogger):
 
 def ensure_cache_dumped(method):
     """
-    Decorator for Collection methods that need the cache cleaned before running.
+    Decorator for SampleCollection methods that need the cache cleaned before running.
     """
 
     @functools.wraps(method)
@@ -85,12 +86,12 @@ def ensure_cache_dumped(method):
     return wrapper
 
 
-class Collection(BaseCollection):
+class SampleCollection(BaseCollection):
     """
     Holds a collection of samples, stored internally into a ``pandas.DataFrame``.
 
-    The DataFrame itself is accessible as the ``Collection.data`` property, but slicing
-    can be done on the ``Collection`` itself (returns a copy, not a view).
+    The DataFrame itself is accessible as the ``SampleCollection.data`` property, but slicing
+    can be done on the ``SampleCollection`` itself (returns a copy, not a view).
 
     Note for developers: when expanding this class or inheriting from it, always access
     the underlying DataFrame as `self.data` and not `self._data`, to ensure the cache has
@@ -124,9 +125,9 @@ class Collection(BaseCollection):
                         self.thin_samples(onload_thin, inplace=True)
                     if load:
                         self.columns = list(self.data.columns)
-                        loaded_chi2_names = set(name for name in self.columns if
-                                                name.startswith(
-                                                    OutPar.chi2 + derived_par_name_separator))
+                        loaded_chi2_names = set(
+                            name for name in self.columns
+                            if name.startswith(OutPar.chi2 + derived_par_name_separator))
                         loaded_chi2_names.discard(
                             OutPar.chi2 + derived_par_name_separator + 'prior')
                         if set(self.chi2_names).difference(loaded_chi2_names):
@@ -294,16 +295,6 @@ class Collection(BaseCollection):
         self._data = pd.concat([self.data[:len(self)], collection.data],
                                ignore_index=True)
 
-    # Retrieve-like methods
-    # MARKED FOR DEPRECATION IN v3.0
-    def n(self):
-        self.log.warning("*DEPRECATION*: `Collection.n()` will be deprecated soon "
-                         "in favor of `len(Collection)`")
-        # BEHAVIOUR TO BE REPLACED BY ERROR:
-        return len(self)
-
-    # END OF DEPRECATION BLOCK
-
     def __len__(self):
         return len(self._data) + (self._cache_last + 1)
 
@@ -357,10 +348,10 @@ class Collection(BaseCollection):
         return self._copy(data=new_data)
 
     @property
-    def values(self):
-        return self.data.values
+    def values(self) -> np.ndarray:
+        return self.data.to_numpy()
 
-    def _copy(self, data=None) -> 'Collection':
+    def _copy(self, data=None) -> 'SampleCollection':
         """
         Returns a copy of the collection.
 
@@ -380,7 +371,7 @@ class Collection(BaseCollection):
         return self_copy
 
     # Dummy function to avoid exposing `data` kwarg, since no checks are performed on it.
-    def copy(self) -> 'Collection':
+    def copy(self) -> 'SampleCollection':
         """
         Returns a copy of the collection.
         """
@@ -431,10 +422,10 @@ class Collection(BaseCollection):
                  (list(self.derived_params) if derived else [])][first:last].T,
             **weights_kwarg))
 
-    def filtered_copy(self, where) -> 'Collection':
+    def filtered_copy(self, where) -> 'SampleCollection':
         return self._copy(self.data[where].reset_index(drop=True))
 
-    def thin_samples(self, thin, inplace=False) -> 'Collection':
+    def thin_samples(self, thin, inplace=False) -> 'SampleCollection':
         if thin == 1:
             return self if inplace else self.copy()
         if thin != int(thin) or thin < 1:
@@ -590,14 +581,14 @@ class OneSamplePoint:
         self.output_thin = output_thin
         self._added_weight = 0
 
-    def add(self, values, weight=1, **kwargs):
+    def add(self, values, results: LogPosterior):
         self.values = values
-        self.kwargs = kwargs
-        self.weight = weight
+        self.results = results
+        self.weight = 1
 
     @property
     def logpost(self):
-        return self.kwargs['logpost']
+        return self.results.logpost
 
     def add_to_collection(self, collection):
         """Adds this point at the end of a given collection."""
@@ -610,7 +601,7 @@ class OneSamplePoint:
                 return False
         else:
             weight = self.weight
-        collection.add(self.values, weight=weight, **self.kwargs)
+        collection.add(self.values, weight=weight, **self.results._asdict())
         return True
 
     def __str__(self):
@@ -618,8 +609,8 @@ class OneSamplePoint:
             ['%s:%.7g' % (k, v) for k, v in zip(self.sampled_params, self.values)])
 
 
-class OnePoint(Collection):
-    """Wrapper of :class:`~collection.Collection` to hold a single point,
+class OnePoint(SampleCollection):
+    """Wrapper of :class:`~collection.SampleCollection` to hold a single point,
     e.g. the best-fit point of a minimization run (not used by default MCMC)."""
 
     def __getitem__(self, columns):

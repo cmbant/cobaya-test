@@ -45,7 +45,7 @@ cobaya_bib = r"""
 def get_desc_component(component, kind, info=None):
     cls = get_class(component, kind, None_if_not_found=True)
     if cls:
-        lines = cleandoc(cls.get_desc(info))
+        lines = cleandoc(cls.get_desc(info) or "")
     else:
         lines = "[no description found]"
     return lines + "\n"

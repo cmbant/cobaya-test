@@ -376,27 +376,31 @@ def recursive_mappings_to_dict(mapping):
         return mapping
 
 
-def recursive_update(base, update):
+_Dict = TypeVar('_Dict', bound=Mapping)
+
+
+def recursive_update(base: Optional[_Dict], update: _Dict, copied=True) -> _Dict:
     """
     Recursive dictionary update, from `this stackoverflow question
     <https://stackoverflow.com/questions/3232943>`_.
     Modified for yaml input, where None and {} are almost equivalent
     """
-    base = base or {}
+    updated: dict = (deepcopy_where_possible(base) if copied and base  # type: ignore
+                     else base or {})
     for update_key, update_value in (update or {}).items():
         if isinstance(update_value, Mapping):
-            base[update_key] = recursive_update(
-                base.get(update_key, {}), update_value)
+            updated[update_key] = recursive_update(updated.get(update_key, {}),
+                                                   update_value, copied=False)
         elif update_value is None:
-            if update_key not in base:
-                base[update_key] = {}
+            if update_key not in updated:
+                updated[update_key] = {}
         else:
-            base[update_key] = update_value
+            updated[update_key] = update_value
     # Trim terminal dicts
-    for k, v in (base or {}).items():
+    for k, v in (updated or {}).items():
         if isinstance(v, Mapping) and len(v) == 0:
-            base[k] = None
-    return base
+            updated[k] = None
+    return updated  # type: ignore
 
 
 def invert_dict(dict_in: Mapping) -> dict:
@@ -427,7 +431,7 @@ def ensure_nolatex(string):
 class NumberWithUnits:
     unit: Optional[str]
 
-    def __init__(self, n_with_unit, unit: str, dtype=float, scale=None):
+    def __init__(self, n_with_unit: Any, unit: str, dtype=float, scale=None):
         """
         Reads number possibly with some `unit`, e.g. 10s, 4d.
         Loaded from a a case-insensitive string of a number followed by a unit,
@@ -477,7 +481,7 @@ class NumberWithUnits:
         return bool(self.unit_value)
 
 
-def read_dnumber(n, dim):
+def read_dnumber(n: Any, dim: int):
     """
     Reads number possibly as a multiple of dimension `dim`.
     """

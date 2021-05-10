@@ -13,7 +13,7 @@ import os
 
 # Local
 from cobaya.conventions import packages_path_arg, packages_path_arg_posix, get_version
-from cobaya.typing import InputDict
+from cobaya.typing import InputDict, LiteralFalse
 from cobaya.output import get_output
 from cobaya.model import Model
 from cobaya.sampler import get_sampler_name_and_class, check_sampler_info, Sampler
@@ -34,7 +34,7 @@ class InfoSamplerTuple(NamedTuple):
 @mpi.sync_state
 def run(info_or_yaml_or_file: Union[InputDict, str, os.PathLike],
         packages_path: Optional[str] = None,
-        output: Union[str, bool, None] = None,
+        output: Union[str, LiteralFalse, None] = None,
         debug: Optional[bool] = None,
         stop_at_error: Optional[bool] = None,
         resume: bool = False, force: bool = False,
@@ -66,12 +66,12 @@ def run(info_or_yaml_or_file: Union[InputDict, str, os.PathLike],
     if no_mpi or test:
         mpi.set_mpi_disabled()
 
-    info: InputDict = load_input_dict(info_or_yaml_or_file)
+    info: InputDict = load_input_dict(info_or_yaml_or_file) # makes deep copy if dict
 
     if override:
         if "post" in override:
             info["resume"] = False
-        info = recursive_update(info, override)
+        info = recursive_update(info, override, copied=False)
     # solve packages installation path cmd > env > input
     if packages_path:
         info["packages_path"] = packages_path

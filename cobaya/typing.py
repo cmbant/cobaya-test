@@ -1,6 +1,7 @@
 from typing import Dict, Any, Optional, Union, Sequence, Type, Callable
 import numpy as np
 from types import MappingProxyType
+import sys
 
 # an immutable empty dict (e.g. for argument defaults)
 empty_dict = MappingProxyType({})
@@ -8,6 +9,7 @@ empty_dict = MappingProxyType({})
 unset_params: Sequence[str] = ()
 
 InfoDict = Dict[str, Any]
+
 LikeDict = InfoDict
 TheoryDict = InfoDict
 SamplerDict = InfoDict
@@ -32,15 +34,11 @@ ExpandedParamsDict = Dict[str, 'ParamDict']
 partags = {"prior", "ref", "proposal", "value", "drop",
            "derived", "latex", "renames", "min", "max"}
 
-try:
-    # noinspection PyUnresolvedReferences
-    from typing import TypedDict
-except ImportError:
-    InputDict = InfoDict
-    ParamDict = InfoDict
-    ModelDict = InfoDict
-    PostDict = InfoDict
-else:
+if sys.version_info >= (3, 8):
+    from typing import TypedDict, Literal
+
+    LiteralFalse = Literal[False]
+
 
     class SciPyDistDict(TypedDict):
         dist: str
@@ -100,6 +98,12 @@ else:
         packages_path: Optional[str]
         output: Optional[str]
         version: Optional[Union[str, InfoDict]]
+
+else:
+    # avoid PyCharm parsing these too...
+    for _x in ('InputDict', 'ParamDict', 'ModelDict', 'PostDict'):
+        globals()[_x] = InfoDict
+    globals()['LiteralFalse'] = bool
 
 try:
     from numpy.typing import ArrayLike

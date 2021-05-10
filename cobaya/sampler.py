@@ -292,6 +292,7 @@ class Sampler(CobayaComponent):
             setattr(self, k, v)
         # check if convergence parameters changed, and if so converged=False
         old_info = self.output.reload_updated_info(use_cache=True)
+        assert old_info
         if self.converge_info_changed(old_info["sampler"][self.get_name()],
                                       self._updated_info):
             self.converged = False
@@ -455,6 +456,7 @@ class CovmatSampler(Sampler):
                 self.log.info("Could not automatically find a good covmat. "
                               "Will generate from parameter info (proposal and prior).")
         # If given, load and test the covariance matrix
+        loaded_params: Sequence[str]
         if isinstance(self.covmat, str):
             covmat_pre = "{%s}" % "packages_path"
             if self.covmat.startswith(covmat_pre):
@@ -531,7 +533,7 @@ class CovmatSampler(Sampler):
                     "The parameters %s have duplicated aliases. Can't assign them an "
                     "element of the covariance matrix unambiguously.",
                     ", ".join([list(params_infos)[i] for i in first]))
-            indices_sampler = list(chain(*indices_sampler))
+            indices_sampler = tuple(chain(*indices_sampler))
             covmat[np.ix_(indices_sampler, indices_sampler)] = (
                 loaded_covmat[np.ix_(indices_used, indices_used)])
             self.log.info(

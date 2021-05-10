@@ -2,8 +2,8 @@ r"""
 .. module:: planck_clik
 
 :Synopsis: Definition of the clik-based likelihoods
-:Author: Jesus Torrado
-         (initially based on MontePython's version by Julien Lesgourgues and Benjamin Audren)
+:Author: Jesus Torrado (initially based on MontePython's version
+         by Julien Lesgourgues and Benjamin Audren)
 
 """
 # Global

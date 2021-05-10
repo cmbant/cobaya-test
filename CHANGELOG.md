@@ -21,6 +21,7 @@
 - bib_script and doc_script can now be called programmatically
 - MPI support refactored using decorators
 - requirements can now also be specified as list of name, dictionary tuples (in case name needs to be repeated)
+- renamed Collection -> SampleCollection (to avoid confusion with general typing.Collection)
 
 ### MCMC
 

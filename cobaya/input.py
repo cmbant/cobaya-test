@@ -443,7 +443,7 @@ def merge_info(*infos):
         previous_params_info = deepcopy(previous_info.pop("params", {}) or {})
         new_params_info = deepcopy(new_info).pop("params", {}) or {}
         # NS: params have been popped, since they have their own merge function
-        current_info = recursive_update(deepcopy(previous_info), new_info)
+        current_info = recursive_update(previous_info, new_info)
         current_info["params"] = merge_params_info(
             [previous_params_info, new_params_info])
         previous_info = current_info
@@ -575,7 +575,7 @@ def get_preferred_old_values(info_old):
     return keep_old
 
 
-class Description(object):
+class Description:
     """Allows for calling get_desc as both class and instance method."""
 
     def __get__(self, instance, cls):

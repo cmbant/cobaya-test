@@ -89,7 +89,7 @@ def reduce_info_param(info_param: ParamDict) -> ParamSpec:
     if info_param.get("derived") is True:
         info_param.pop("derived")
     # Fixed parameters with single "value" key
-    if list(info_param) == ["value"]:
+    if list(info_param) == ["value"] and not callable(info_param["value"]):
         return info_param["value"]
     return info_param
 
@@ -353,16 +353,14 @@ class Parameterization(HasLogger):
             input_ = not_used.intersection(self._input)
             unknown = not_used.difference(derived).difference(input_)
             msg_text = ("Incorrect parameters! " +
-                        ("\n   Duplicated entries (using their aliases): %r" % list(
-                            duplicated)
-                         if duplicated else "") +
+                        ("\n   Duplicated entries (using their aliases): %r" %
+                         list(duplicated) if duplicated else "") +
                         ("\n   Not known: %r" % list(unknown) if unknown else "") +
                         ("\n   Cannot be fixed: %r " % list(input_) +
                          "--> instead, fix sampled parameters that depend on them!"
                          if input_ else "") +
-                        (
-                            "\n   Cannot be fixed because are derived parameters: %r " % list(
-                                derived) if derived else ""))
+                        ("\n   Cannot be fixed because are derived parameters: %r " %
+                         list(derived) if derived else ""))
             for line in msg_text.split("\n"):
                 self.log.error(line)
             raise LoggedError
