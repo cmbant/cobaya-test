@@ -66,7 +66,7 @@ def run(info_or_yaml_or_file: Union[InputDict, str, os.PathLike],
     if no_mpi or test:
         mpi.set_mpi_disabled()
 
-    info: InputDict = load_input_dict(info_or_yaml_or_file) # makes deep copy if dict
+    info: InputDict = load_input_dict(info_or_yaml_or_file)  # makes deep copy if dict
 
     if override:
         if "post" in override:
@@ -152,12 +152,11 @@ def run(info_or_yaml_or_file: Union[InputDict, str, os.PathLike],
             updated_info = recursive_update(updated_info, model.info())
             out.check_and_dump_info(None, updated_info, check_compatible=False)
             sampler = sampler_class(updated_info["sampler"][sampler_name],
-                                    model, out,
+                                    model, out, name=sampler_name,
                                     packages_path=info.get("packages_path"))
             # Re-dump updated info, now also containing updates from the sampler
-            updated_info["sampler"][sampler.get_name()] = \
-                recursive_update(
-                    updated_info["sampler"][sampler.get_name()], sampler.info())
+            updated_info["sampler"][sampler_name] = \
+                recursive_update(updated_info["sampler"][sampler_name], sampler.info())
             # TODO -- maybe also re-dump model info, now possibly with measured speeds
             # (waiting until the camb.transfers issue is solved)
             out.check_and_dump_info(None, updated_info, check_compatible=False)

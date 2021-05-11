@@ -29,7 +29,7 @@ from cobaya.model import LogPosterior
 from cobaya import mpi
 
 
-class mcmc(CovmatSampler):
+class MCMC(CovmatSampler):
     r"""
     Adaptive, speed-hierarchy-aware MCMC sampler (adapted from CosmoMC)
     \cite{Lewis:2002ah,Lewis:2013hha}.
@@ -41,6 +41,7 @@ class mcmc(CovmatSampler):
         "Rminus1_cl_level", "covmat", "covmat_params"]
     _at_resume_prefer_old = CovmatSampler._at_resume_prefer_new + [
         "proposal_scale", "blocking"]
+    file_base_name = 'mcmc'
 
     # instance variables from yaml
     burn_in: NumberWithUnits

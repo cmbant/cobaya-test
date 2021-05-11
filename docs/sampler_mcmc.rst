@@ -314,7 +314,7 @@ Module documentation
 MCMC sampler class
 ^^^^^^^^^^^^^^^^^^^
 
-.. autoclass:: samplers.mcmc.mcmc
+.. autoclass:: samplers.mcmc.MCMC
    :members:
 
 Progress monitoring

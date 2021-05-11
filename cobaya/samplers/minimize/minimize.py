@@ -1,11 +1,11 @@
 r"""
-.. module:: samplers.minimize
+.. module:: samplers.Minimize
 
 :Synopsis: Posterior/likelihood *maximization* (i.e. -log(post) and chi^2 minimization).
 :Author: Jesus Torrado
 
 This is a **maximizer** for posteriors or likelihoods, based on
-`scipy.optimize.minimize <https://docs.scipy.org/doc/scipy/reference/generated/scipy.optimize.minimize.html>`_
+`scipy.optimize.Minimize <https://docs.scipy.org/doc/scipy/reference/generated/scipy.optimize.minimize.html>`_
 and `Py-BOBYQA <https://numericalalgorithmsgroup.github.io/pybobyqa/build/html/index.html>`_
 (added in 2.0).
 
@@ -37,7 +37,7 @@ and `Py-BOBYQA <https://numericalalgorithmsgroup.github.io/pybobyqa/build/html/i
    <https://docs.scipy.org/doc/scipy/reference/generated/scipy.optimize.minimize.html>`_.
 
 It works more effectively when run on top of a Monte Carlo sample: just change the sampler
-for ``minimize`` with the desired options, and it will use as a starting point the
+for ``Minimize`` with the desired options, and it will use as a starting point the
 *maximum a posteriori* (MAP) or best fit (maximum likelihood, or minimal :math:`\chi^2`)
 found so far, as well as the covariance matrix of the sample for rescaling of the
 parameter jumps.
@@ -64,7 +64,7 @@ and contain the best-fit (maximum of the likelihood) instead of the MAP
 
 When called from a Python script, Cobaya's ``run`` function returns the updated info
 and the products described below in the method
-:func:`products <samplers.minimize.minimize.products>`.
+:func:`products <samplers.Minimize.Minimize.products>`.
 
 It is recommended to run a couple of parallel MPI processes:
 it will finally pick the best among the results.
@@ -126,7 +126,9 @@ _bobyqa_errors = {
         "singular linear system."}
 
 
-class minimize(Minimizer, CovmatSampler):
+class Minimize(Minimizer, CovmatSampler):
+    file_base_name = 'minimize'
+
     ignore_prior: bool
     confidence_for_unbounded: float
     method: str
@@ -225,7 +227,7 @@ class minimize(Minimizer, CovmatSampler):
 
     def run(self):
         """
-        Runs `scipy.minimize`
+        Runs `scipy.Minimize`
         """
         results = []
         successes = []
@@ -272,7 +274,7 @@ class minimize(Minimizer, CovmatSampler):
                             "maxiter": self.max_iter,
                             "disp": (self.log.getEffectiveLevel() == logging.DEBUG)}}
                     self.kwargs = recursive_update(self.kwargs, self.override_scipy or {})
-                    self.log.debug("Arguments for scipy.optimize.minimize:\n%r",
+                    self.log.debug("Arguments for scipy.optimize.Minimize:\n%r",
                                    {k: v for k, v in self.kwargs.items() if k != "fun"})
                     result = optimize.minimize(**self.kwargs)
                     success = result.success
@@ -465,8 +467,8 @@ class minimize(Minimizer, CovmatSampler):
                        r"minimization algorithm \cite{BOBYQA}")
         desc_scipy = (r"Scipy minimizer \cite{2020SciPy-NMeth} (check citation for the "
                       r"actual algorithm used at \url{https://docs.scipy.org/doc/scipy/re"
-                      r"ference/generated/scipy.optimize.minimize.html}")
-        if method and method and method.lower() == "bobyqa":
+                      r"ference/generated/scipy.optimize.Minimize.html}")
+        if method and method.lower() == "bobyqa":
             return desc_bobyqa
         elif method and method.lower() == "scipy":
             return desc_scipy
