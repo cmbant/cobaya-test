@@ -608,8 +608,8 @@ class HasDefaults:
                 if getattr(imported, cls.__name__, None) is cls:
                     parts = parts[:-1]
         # allow removing class name that is CamelCase equivalent of module name
-        equiv_name = parts[-1][:1] + parts[-1][1:].replace('_', '')
-        if equiv_name == cls.__name__.lower():
+        if parts[-1] == cls.__name__ or (cls.__name__.lower() ==
+                                         parts[-1][:1] + parts[-1][1:].replace('_', '')):
             return ['.'.join(parts[i:]) for i in range(len(parts))]
         else:
             return ['.'.join(parts[i:]) + '.' + cls.__name__ for i in

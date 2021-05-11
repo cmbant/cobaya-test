@@ -93,23 +93,23 @@ def get_base_classes():
     return {"sampler": Sampler, "likelihood": Likelihood, "theory": Theory}
 
 
-def get_kind(name, allow_external=True):
+def get_kind(name: str, allow_external=True) -> str:
     """
     Given a helpfully unique component name, tries to determine it's kind:
     ``sampler``, ``theory`` or ``likelihood``.
     """
-    try:
-        return next(
-            k for k in kinds
-            if name in get_available_internal_class_names(k))
-    except StopIteration:
-        if allow_external:
-            cls = get_class(name, None_if_not_found=True, allow_internal=False)
-            if cls:
-                for kind, tp in get_base_classes().items():
-                    if issubclass(cls, tp):
-                        return kind
+    for i, kind in enumerate(kinds):
+        cls = get_class(name, kind, allow_external=allow_external and i == len(kinds) - 1,
+                        None_if_not_found=True)
+        if cls is not None:
+            break
+    else:
         raise LoggedError(log, "Could not find component with name %r", name)
+    for kind, tp in get_base_classes().items():
+        if issubclass(cls, tp):
+            return kind
+
+    raise LoggedError(log, "Class %r is not a standard class type %r", name, kinds)
 
 
 class PythonPath:
@@ -235,10 +235,10 @@ def get_class(name, kind=None, None_if_not_found=False, allow_external=True,
                 return return_class(module_name)
             except:
                 exc_info = sys.exc_info()
+    if None_if_not_found:
+        return None
     if ((exc_info[0] is ModuleNotFoundError and
          str(exc_info[1]).rstrip("'").endswith(name))):
-        if None_if_not_found:
-            return None
         if allow_internal:
             suggestions = fuzzy_match(name, get_available_internal_class_names(kind), n=3)
             if suggestions:
@@ -274,7 +274,7 @@ def get_resolved_class(component_or_class, kind=None, component_path=None,
 def import_all_classes(path, pkg, subclass_of, hidden=False, helpers=False):
     import pkgutil
     result = set()
-    ignore = {"cobaya/likelihoods": ["base_classes", "test"]}
+    ignore = {os.path.join("cobaya", "likelihoods"): ["base_classes", "test"]}
     from cobaya.theory import HelperTheory
     for (module_loader, name, ispkg) in pkgutil.iter_modules([path]):
         ignore_this_one = \
@@ -329,9 +329,10 @@ def get_all_available_internal_classes(hidden=False):
     return set(chain(*(get_available_internal_classes(k, hidden) for k in kinds)))
 
 
-def get_available_internal_class_names(kind, hidden=False):
+def get_available_internal_class_names(kind=None, hidden=False):
     return sorted(set(cls.get_qualified_class_name() for cls in
-                      get_available_internal_classes(kind, hidden)))
+                      (get_available_internal_classes(kind, hidden) if kind
+                       else get_all_available_internal_classes(hidden))))
 
 
 def replace_optimizations(function_string):
