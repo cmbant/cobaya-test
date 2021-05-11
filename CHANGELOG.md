@@ -22,6 +22,8 @@
 - MPI support refactored using decorators
 - requirements can now also be specified as list of name, dictionary tuples (in case name needs to be repeated)
 - renamed Collection -> SampleCollection (to avoid confusion with general typing.Collection)
+- allow loading of CamelCase classes from module with related name. Class "file_base_name" attribute to
+  optional specify the root name for yaml and bib files
 
 ### MCMC
 

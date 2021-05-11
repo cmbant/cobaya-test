@@ -602,7 +602,7 @@ class HasDefaults:
     """
 
     @classmethod
-    def get_qualified_names(cls):
+    def get_qualified_names(cls) -> List[str]:
         if cls.__module__ == '__main__':
             return [cls.__name__]
         parts = cls.__module__.split('.')
@@ -622,7 +622,7 @@ class HasDefaults:
                     range(len(parts) + 1)]
 
     @classmethod
-    def get_qualified_class_name(cls):
+    def get_qualified_class_name(cls) -> str:
         """
         Get the distinct shortest reference name for the class of the form
         module.ClassName or module.submodule.ClassName etc.
@@ -641,18 +641,26 @@ class HasDefaults:
             return qualified_names[0]
 
     @classmethod
-    def get_class_path(cls):
+    def get_class_path(cls) -> str:
         """
         Get the file path for the class.
         """
         return os.path.abspath(os.path.dirname(inspect.getfile(cls)))
 
     @classmethod
-    def get_root_file_name(cls):
-        return os.path.join(cls.get_class_path(), cls.__name__)
+    def get_file_base_name(cls) -> str:
+        """
+        Gets the string used as the name for .yaml, .bib files, typically the
+        class name or a un-CamelCased class name
+        """
+        return cls.__dict__.get('file_base_name') or cls.__name__
 
     @classmethod
-    def get_yaml_file(cls):
+    def get_root_file_name(cls) -> str:
+        return os.path.join(cls.get_class_path(), cls.get_file_base_name())
+
+    @classmethod
+    def get_yaml_file(cls) -> Optional[str]:
         """
         Gets the file name of the .yaml file for this component if it exists on file
         (otherwise None).
@@ -662,55 +670,45 @@ class HasDefaults:
             return filename
         return None
 
-    get_desc = Description()
+    get_desc: str = Description()
 
     @classmethod
     def _get_desc(cls, info=None):
         return cleandoc(cls.__doc__) if cls.__doc__ else ""
 
     @classmethod
-    def get_bibtex(cls):
+    def get_bibtex(cls) -> Optional[str]:
         """
         Get the content of .bibtex file for this component. If no specific bibtex
         from this class, it will return the result from an inherited class if that
         provides bibtex.
         """
-        filename = cls.__dict__.get('bibtex_file', None)
+        filename = cls.__dict__.get('bibtex_file')
         if filename:
-            bib = pkg_resources.resource_string(cls.__module__, filename)
+            bib = pkg_resources.resource_string(cls.__module__, filename).decode("utf-8")
         else:
             bib = cls.get_associated_file_content('.bibtex')
         if bib:
-            try:
-                return bib.decode("utf-8")
-            except:
-                return bib
+            return bib
         for base in cls.__bases__:
             if issubclass(base, HasDefaults) and base is not HasDefaults:
-                bib = base.get_bibtex()
-                if bib:
-                    try:
-                        return bib.decode("utf-8")
-                    except:
-                        return bib
+                return base.get_bibtex()
         return None
 
     @classmethod
-    def get_associated_file_content(cls, ext, file_root=None):
+    def get_associated_file_content(cls, ext, file_root=None) -> Optional[str]:
         # handle extracting package files when may be inside a zipped package so files
         # not accessible directly
         try:
-            string = pkg_resources.resource_string(cls.__module__,
-                                                   (file_root or cls.__name__) + ext)
-            try:
-                return string.decode("utf-8")
-            except:
-                return string
+            string = pkg_resources.resource_string(
+                cls.__module__, (file_root or cls.get_file_base_name()) + ext)
         except Exception:
             return None
+        else:
+            return string.decode("utf-8")
 
     @classmethod
-    def get_class_options(cls, input_options=empty_dict):
+    def get_class_options(cls, input_options=empty_dict) -> InfoDict:
         """
         Returns dictionary of names and values for class variables that can also be
         input and output in yaml files, by default it takes all the
@@ -789,7 +787,7 @@ class HasDefaults:
             return defaults
 
     @classmethod
-    def get_annotations(cls):
+    def get_annotations(cls) -> InfoDict:
         d = {}
         for base in cls.__bases__:
             if issubclass(base, HasDefaults) and base is not HasDefaults:

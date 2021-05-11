@@ -199,7 +199,7 @@ class CAMBOutputs(NamedTuple):
     derived: dict
 
 
-class camb(BoltzmannBase):
+class CAMB(BoltzmannBase):
     r"""
     CAMB cosmological Boltzmann code \cite{Lewis:1999bs,Howlett:2012mh}.
     """
@@ -209,6 +209,7 @@ class camb(BoltzmannBase):
     _camb_min_gcc_version = "6.4"
     _min_camb_version = '1.1.3'
 
+    file_base_name = 'camb'
     external_primordial_pk: bool
     camb: Any
 

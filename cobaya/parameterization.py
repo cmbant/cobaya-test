@@ -15,35 +15,35 @@ from copy import deepcopy
 from typing import Mapping, Sequence, Dict, Set, List
 
 # Local
-from cobaya.typing import ParamsDict, ParamDict, ParamSpec, \
+from cobaya.typing import ParamsDict, ParamDict, ParamInput, \
     ExpandedParamsDict, ParamValuesDict, partags
 from cobaya.tools import get_external_function, ensure_nolatex, is_valid_variable_name, \
     getfullargspec, deepcopy_where_possible, invert_dict, str_to_list
 from cobaya.log import LoggedError, HasLogger
 
 
-def is_fixed_or_function_param(info_param: ParamSpec) -> bool:
+def is_fixed_or_function_param(info_param: ParamInput) -> bool:
     """
     Returns True if the parameter has been fixed to a value or through a function.
     """
     return expand_info_param(info_param).get("value") is not None
 
 
-def is_sampled_param(info_param: ParamSpec) -> bool:
+def is_sampled_param(info_param: ParamInput) -> bool:
     """
     Returns True if the parameter has a prior.
     """
     return "prior" in expand_info_param(info_param)
 
 
-def is_derived_param(info_param: ParamSpec) -> bool:
+def is_derived_param(info_param: ParamInput) -> bool:
     """
     Returns True if the parameter is saved as a derived one.
     """
     return expand_info_param(info_param).get("derived", False) is not False
 
 
-def expand_info_param(info_param: ParamSpec, default_derived=True) -> ParamDict:
+def expand_info_param(info_param: ParamInput, default_derived=True) -> ParamDict:
     """
     Expands the info of a parameter, from the user friendly, shorter format
     to a more unambiguous one.
@@ -77,7 +77,7 @@ def expand_info_param(info_param: ParamSpec, default_derived=True) -> ParamDict:
     return info_param
 
 
-def reduce_info_param(info_param: ParamDict) -> ParamSpec:
+def reduce_info_param(info_param: ParamDict) -> ParamInput:
     """
     Compresses the info of a parameter, suppressing default values.
     This is the opposite of :func:`~input.expand_info_param`.

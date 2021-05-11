@@ -19,10 +19,11 @@ from cobaya.typing import ArrayLike, ArrayOrFloat, InputDict
 derived_suffix = "_derived"
 
 
-class gaussian_mixture(Likelihood):
+class GaussianMixture(Likelihood):
     """
     Gaussian likelihood.
     """
+    file_base_name = 'gaussian_mixture'
 
     # yaml variables
     means: ArrayLike

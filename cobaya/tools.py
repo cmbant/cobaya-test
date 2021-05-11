@@ -16,6 +16,7 @@ import inspect
 import re
 import pandas as pd
 import numpy as np
+from itertools import chain
 from importlib import import_module
 from copy import deepcopy
 from packaging import version
@@ -189,18 +190,28 @@ def get_class(name, kind=None, None_if_not_found=False, allow_external=True,
         class_name = None
     assert allow_internal or allow_external
 
+    def get_matching_class_name(_module: Any, _class_name, none=False):
+        cls = getattr(_module, _class_name, None)
+        if cls is None and _class_name == _class_name.lower():
+            # where the _class_name may be a module name, find CamelCased class
+            cls = module_class_for_name(_module, _class_name)
+        if cls or none:
+            return cls
+        else:
+            return getattr(_module, _class_name)
+
     def return_class(_module_name, package=None):
         _module: Any = load_module(_module_name, package=package, path=component_path)
         if not class_name and hasattr(_module, "get_cobaya_class"):
             return _module.get_cobaya_class()
         _class_name = class_name or module_name
-        cls = getattr(_module, _class_name, None)
+        cls = get_matching_class_name(_module, _class_name, none=True)
         if not cls:
             _module = load_module(_module_name + '.' + _class_name,
                                   package=package, path=component_path)
-            cls = getattr(_module, _class_name)
+            cls = get_matching_class_name(_module, _class_name)
         if not inspect.isclass(cls):
-            return getattr(cls, _class_name)
+            return get_matching_class_name(cls, _class_name)
         else:
             return cls
 
@@ -283,6 +294,26 @@ def import_all_classes(path, pkg, subclass_of, hidden=False, helpers=False):
     return result
 
 
+def classes_in_module(m, subclass_of=None, allow_imported=False):
+    return set(cls for _, cls in inspect.getmembers(m, inspect.isclass)
+               if (not subclass_of or issubclass(cls, subclass_of))
+               and (allow_imported or cls.__module__ == m.__name__))
+
+
+def module_class_for_name(m, name):
+    # Get Camel- or uppercase class name matching name in module m
+    result = None
+    valid_names = name, name.replace('_', '')
+    from cobaya.component import CobayaComponent
+    for cls in classes_in_module(m, subclass_of=CobayaComponent):
+        if cls.__name__.lower() in valid_names:
+            if result is not None:
+                raise ValueError('More than one class with same lowercase name %s',
+                                 name)
+            result = cls
+    return result
+
+
 def get_available_internal_classes(kind, hidden=False):
     """
     Gets all class names of a given kind.
@@ -295,16 +326,12 @@ def get_available_internal_classes(kind, hidden=False):
 
 
 def get_all_available_internal_classes(hidden=False):
-    result = set()
-    for classes in [get_available_internal_classes(k, hidden) for k in kinds]:
-        result.update(classes)
-    return result
+    return set(chain(*(get_available_internal_classes(k, hidden) for k in kinds)))
 
 
 def get_available_internal_class_names(kind, hidden=False):
-    return sorted(set(
-        cls.get_qualified_class_name() for cls in
-        get_available_internal_classes(kind, hidden)))
+    return sorted(set(cls.get_qualified_class_name() for cls in
+                      get_available_internal_classes(kind, hidden)))
 
 
 def replace_optimizations(function_string):
