@@ -132,7 +132,7 @@ def bib_script(args=None):
                 print(create_banner(
                     component, symbol=_default_symbol, length=_default_length))
                 print(get_bib_component(component, arguments.kind))
-            except:
+            except Exception:
                 if not arguments.kind:
                     print("Specify its kind with '--%s [component_kind]'." % kind_opt +
                           "(NB: all requested components must have the same kind, "

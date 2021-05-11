@@ -15,6 +15,7 @@ TheoryDict = InfoDict
 SamplerDict = InfoDict
 
 ParamValuesDict = Dict[str, float]
+# Do not yet explicitly support passing instances here
 TheoriesDict = Dict[str, Union[None, TheoryDict, Type]]
 LikesDict = Dict[str, Union[None, LikeDict, Type]]
 SamplersDict = Dict[str, Optional[SamplerDict]]

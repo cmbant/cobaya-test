@@ -376,6 +376,8 @@ class TheoryCollection(ComponentCollection):
                 # If it has an "external" key, wrap it up. Else, load it up
                 if isinstance(info, Theory):
                     self.add_instance(name, info)
+                elif isinstance(info.get("external"), Theory):
+                    self.add_instance(name, info["external"])
                 else:
                     if "external" in info:
                         theory_class = info["external"]

@@ -250,60 +250,52 @@ def update_info(info: _Dict) -> _Dict:
         updated: InfoDict = {}
         updated_info[block] = updated
         input_block = input_info[block]
-        kind: str
-        for kind in used_kind_members[block]:
+        name: str
+        for name in used_kind_members[block]:
             # Preprocess "no options" and "external function" in input
             try:
-                input_block[kind] = input_block[kind] or {}
+                input_block[name] = input_block[name] or {}
             except TypeError:
                 raise LoggedError(
                     log, "Your input info is not well formatted at the '%s' block. "
                          "It must be a dictionary {'%s_i':{options}, ...}. ",
                     block, block)
-            if isinstance(kind, CobayaComponent) or \
-                    isinstance(input_block[kind], CobayaComponent):
-                raise LoggedError(log, "Input for %s:%s should specify a class not "
-                                       "an instance", block, kind)
-                # TODO: allow instance passing?
-                #       could allow this, but would have to sort out deepcopy
-                # if input_block[component]:
-                #   raise LoggedError(log, "Instances should be passed a dictionary "
-                #                           "entry of the form 'instance: None'")
-                # change_key(input_block, component, component.get_name(),
-                #           {"external": component})
-                # updated[component.get_name()] = input_block[component.get_name()].copy()
-                # continue
-            if inspect.isclass(input_block[kind]) or \
-                    not isinstance(input_block[kind], dict):
-                input_block[kind] = {"external": input_block[kind]}
-            ext = input_block[kind].get("external")
+            if isinstance(name, CobayaComponent) or inspect.isclass(name):
+                raise LoggedError(log, "Instances and classes should be passed a "
+                                       "dictionary entry of the form 'name: instance'")
+            if isinstance(input_block[name], CobayaComponent):
+                log.warning("Support for input instances is experimental")
+            if inspect.isclass(input_block[name]) or \
+                    not isinstance(input_block[name], dict):
+                input_block[name] = {"external": input_block[name]}
+            ext = input_block[name].get("external")
             annotations = {}
             if ext:
                 if inspect.isclass(ext):
                     default_class_info, annotations = \
-                        get_default_info(ext, block, input_options=input_block[kind],
+                        get_default_info(ext, block, input_options=input_block[name],
                                          return_undefined_annotations=True)
                 else:
                     default_class_info = deepcopy_where_possible(
                         component_base_classes[block].get_defaults())
             else:
-                component_path = input_block[kind].get("python_path", None)
+                component_path = input_block[name].get("python_path", None)
                 default_class_info, annotations = get_default_info(
-                    kind, block, class_name=input_block[kind].get("class"),
-                    component_path=component_path, input_options=input_block[kind],
+                    name, block, class_name=input_block[name].get("class"),
+                    component_path=component_path, input_options=input_block[name],
                     return_undefined_annotations=True)
-            updated[kind] = default_class_info or {}
+            updated[name] = default_class_info or {}
             # Update default options with input info
             # Consistency is checked only up to first level! (i.e. subkeys may not match)
             # Reserved attributes not necessarily already in default info:
             reserved = {"external", "class", "provides", "requires", "renames",
                         "input_params", "output_params", "python_path", "aliases"}
-            options_not_recognized = set(input_block[kind]).difference(
-                chain(reserved, updated[kind], annotations))
+            options_not_recognized = set(input_block[name]).difference(
+                chain(reserved, updated[name], annotations))
             if options_not_recognized:
                 alternatives = {}
-                available = ({"external", "class", "requires", "renames"}.union(
-                    updated_info[block][kind]))
+                available = {"external", "class", "requires", "renames"}.union(
+                    updated_info[block][name])
                 while options_not_recognized:
                     option = options_not_recognized.pop()
                     alternatives[option] = fuzzy_match(option, available, n=3)
@@ -314,11 +306,11 @@ def update_info(info: _Dict) -> _Dict:
                 raise LoggedError(
                     log, "%s '%s' does not recognize some options: %s. "
                          "Check the documentation for '%s'.",
-                    block, kind, did_you_mean, block)
-            updated[kind].update(input_block[kind])
+                    block, name, did_you_mean, block)
+            updated[name].update(input_block[name])
             # save params and priors of class to combine later
-            default_params_info[kind] = default_class_info.get("params", {})
-            default_prior_info[kind] = default_class_info.get("prior", {})
+            default_params_info[name] = default_class_info.get("params", {})
+            default_prior_info[name] = default_class_info.get("prior", {})
     # Add priors info, after the necessary checks
     if "prior" in input_info or any(default_prior_info.values()):
         updated_info["prior"] = input_info.get("prior", {})
@@ -345,9 +337,9 @@ def update_info(info: _Dict) -> _Dict:
     if "auto_params" in updated_info:
         make_auto_params(updated_info.pop("auto_params"), param_info)
     # Add aliases for theory params (after merging!)
-    for kind in ("theory", "likelihood"):
-        if isinstance(updated_info.get(kind), dict):
-            for item in updated_info[kind].values():
+    for name in ("theory", "likelihood"):
+        if isinstance(updated_info.get(name), dict):
+            for item in updated_info[name].values():
                 renames = item.get("renames")
                 if renames:
                     if not isinstance(renames, Mapping):
@@ -615,7 +607,9 @@ class HasDefaults:
             else:
                 if getattr(imported, cls.__name__, None) is cls:
                     parts = parts[:-1]
-        if parts[-1] == cls.__name__:
+        # allow removing class name that is CamelCase equivalent of module name
+        equiv_name = parts[-1][:1] + parts[-1][1:].replace('_', '')
+        if equiv_name == cls.__name__.lower():
             return ['.'.join(parts[i:]) for i in range(len(parts))]
         else:
             return ['.'.join(parts[i:]) + '.' + cls.__name__ for i in

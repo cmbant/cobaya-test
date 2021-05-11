@@ -36,7 +36,7 @@ with warnings.catch_warnings():
 # Local
 from cobaya.conventions import cobaya_package, subfolders, kinds, \
     packages_path_config_file, packages_path_env, packages_path_arg, dump_sort_cosmetic
-from cobaya.log import LoggedError
+from cobaya.log import LoggedError, HasLogger
 
 # Set up logger
 log = logging.getLogger(__name__.split(".")[-1])
@@ -303,7 +303,7 @@ def classes_in_module(m, subclass_of=None, allow_imported=False):
 def module_class_for_name(m, name):
     # Get Camel- or uppercase class name matching name in module m
     result = None
-    valid_names = name, name.replace('_', '')
+    valid_names = {name, name[:1] + name[1:].replace('_', '')}
     from cobaya.component import CobayaComponent
     for cls in classes_in_module(m, subclass_of=CobayaComponent):
         if cls.__name__.lower() in valid_names:
@@ -780,7 +780,7 @@ _R = TypeVar('_R')
 def deepcopy_where_possible(base: _R) -> _R:
     """
     Deepcopies an object whenever possible. If the object cannot be copied, returns a
-    reference to the original object (this applies recursively to keys and values of
+    reference to the original object (this applies recursively to values of
     a dictionary, and converts all Mapping objects into dict).
 
     Rationale: cobaya tries to manipulate its input as non-destructively as possible,
@@ -791,10 +791,11 @@ def deepcopy_where_possible(base: _R) -> _R:
     """
     if isinstance(base, Mapping):
         _copy = {}
-        for key, value in (base or {}).items():
-            key_copy = deepcopy(key)
-            _copy[key_copy] = deepcopy_where_possible(value)
+        for key, value in base.items():
+            _copy[key] = deepcopy_where_possible(value)
         return _copy  # type: ignore
+    if isinstance(base, (HasLogger, type)):
+        return base
     else:
         try:
             return deepcopy(base)
