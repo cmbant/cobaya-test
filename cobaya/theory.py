@@ -34,7 +34,7 @@ import inspect
 from collections import deque
 from typing import Sequence, Optional, Union, Tuple, Dict, Iterable, Set, Any
 # Local
-from cobaya.typing import TheoryDict, TheoriesDict, InfoDict, ParamValuesDict, \
+from cobaya.typing import TheoryDictIn, TheoriesDict, InfoDict, ParamValuesDict, \
     ParamsDict, empty_dict, unset_params
 from cobaya.component import CobayaComponent, ComponentCollection
 from cobaya.tools import get_resolved_class, str_to_list
@@ -57,7 +57,7 @@ class Theory(CobayaComponent):
 
     _states: deque
 
-    def __init__(self, info: TheoryDict = empty_dict,
+    def __init__(self, info: TheoryDictIn = empty_dict,
                  name: Optional[str] = None, timing: Optional[bool] = None,
                  packages_path: Optional[str] = None,
                  initialize=True, standalone=True):

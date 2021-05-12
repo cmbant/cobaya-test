@@ -796,7 +796,7 @@ def deepcopy_where_possible(base: _R) -> _R:
             _copy[key] = deepcopy_where_possible(value)
         return _copy  # type: ignore
     if isinstance(base, (HasLogger, type)):
-        return base
+        return base # type: ignore
     else:
         try:
             return deepcopy(base)

@@ -124,11 +124,12 @@ def yaml_load(text_stream, file_name=None) -> InfoDict:
             raise InputSyntaxError(errstr)
 
 
-def yaml_load_file(file_name: str, yaml_text: Optional[str] = None) -> InfoDict:
+def yaml_load_file(file_name: Optional[str], yaml_text: Optional[str] = None) -> InfoDict:
     """Wrapper to load a yaml file.
 
     Manages !defaults directive."""
     if yaml_text is None:
+        assert file_name
         with open(file_name, "r", encoding="utf-8-sig") as file:
             yaml_text = "".join(file.readlines())
     return yaml_load(yaml_text, file_name=file_name)

@@ -12,7 +12,7 @@ import numpy as np
 from numbers import Real
 from itertools import chain
 from copy import deepcopy
-from typing import Mapping, Sequence, Dict, Set, List
+from typing import Mapping, Sequence, Dict, Set, List, Tuple, Any, Callable
 
 # Local
 from cobaya.typing import ParamsDict, ParamDict, ParamInput, \
@@ -92,6 +92,9 @@ def reduce_info_param(info_param: ParamDict) -> ParamInput:
     if list(info_param) == ["value"] and not callable(info_param["value"]):
         return info_param["value"]
     return info_param
+
+
+_WrappedFunc = Tuple[Callable, Dict[str, Any], List[str]]
 
 
 class Parameterization(HasLogger):
@@ -409,7 +412,7 @@ class Parameterization(HasLogger):
         # get evaluation order for input and derived parameter function
         # and pre-prepare argument dicts
 
-        wrapped_funcs = ({}, {})
+        wrapped_funcs: Tuple[Dict[str, _WrappedFunc], Dict[str, _WrappedFunc]] = ({}, {})
         known = set(chain(self._constant, self._sampled))
 
         for derived, wrapped_func in zip((False, True), wrapped_funcs):

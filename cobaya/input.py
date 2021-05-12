@@ -279,7 +279,7 @@ def update_info(info: _Dict) -> _Dict:
                     default_class_info = deepcopy_where_possible(
                         component_base_classes[block].get_defaults())
             else:
-                component_path = input_block[name].get("python_path", None)
+                component_path = input_block[name].get("python_path")
                 default_class_info, annotations = get_default_info(
                     name, block, class_name=input_block[name].get("class"),
                     component_path=component_path, input_options=input_block[name],

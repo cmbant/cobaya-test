@@ -1,23 +1,29 @@
-from typing import Dict, Any, Optional, Union, Sequence, Type, Callable
+from typing import Dict, Any, Optional, Union, Sequence, Type, Callable, Mapping
 import numpy as np
 from types import MappingProxyType
 import sys
 
+InfoDict = Dict[str, Any]
+InfoDictIn = Mapping[str, Any]
+
 # an immutable empty dict (e.g. for argument defaults)
-empty_dict = MappingProxyType({})
+empty_dict: InfoDictIn = MappingProxyType({})
 # empty iterator-compatible object that can be used like None to test if assigned
 unset_params: Sequence[str] = ()
-
-InfoDict = Dict[str, Any]
 
 LikeDict = InfoDict
 TheoryDict = InfoDict
 SamplerDict = InfoDict
 
+# Read-only versions for input
+LikeDictIn = InfoDictIn
+TheoryDictIn = InfoDictIn
+SamplerDictIn = InfoDictIn
+
 ParamValuesDict = Dict[str, float]
 # Do not yet explicitly support passing instances here
 TheoriesDict = Dict[str, Union[None, TheoryDict, Type]]
-LikesDict = Dict[str, Union[None, LikeDict, Type]]
+LikesDict = Dict[str, Union[None, LikeDict, Type, Callable]]
 SamplersDict = Dict[str, Optional[SamplerDict]]
 PriorsDict = Dict[str, Union[str, Callable]]
 

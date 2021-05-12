@@ -22,8 +22,9 @@
 - MPI support refactored using decorators
 - requirements can now also be specified as list of name, dictionary tuples (in case name needs to be repeated)
 - renamed Collection -> SampleCollection (to avoid confusion with general typing.Collection)
-- allow loading of CamelCase classes from module with related name. Class "file_base_name" attribute to
-  optional specify the root name for yaml and bib files
+- allow loading of CamelCase classes from module with lowercase name. Class "file_base_name" attribute to
+  optionally specify the root name for yaml and bib files. Some supplied classes renamed.
+- allow input likelihoods and theories to be instances (as well as classes); [provisional]
 
 ### MCMC
 
@@ -31,7 +32,9 @@
 - MPI reworked, now avoids ending and error deadlocks, and synchronizing exceptions
   (raising OtherProcessError on non-excepting processes)
 - Random number generation now using numpy 1.17 generators and MPI seeds generated using SeedSequence
+  (note MPI runs generally not reproducible with fixed seed due to thead timing/asynchronous mpi exchanges)
 - Overhead reduced by at least 40%, thanks to caching in Collection
+- Some refactoring/simplification to pass LogPosterior instances more consistently
 
 ### Post-processing
 
@@ -50,6 +53,10 @@
 - `PyBOBYQA` updated to 1.2, and quieter by default.
 - 'best_of' parameter to probe different random starting positions (replacing seek_global_minimum for non-MPI)
 - 'rhobeg' parameter larger to avoid odd hangs
+
+### Cosmology:
+
+- Install updated Planck clik code (3.1) 
 
 ### Tests
 
