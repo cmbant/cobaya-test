@@ -154,7 +154,7 @@ class Model(HasLogger):
         # Evaluation of non-uniform priors will add some overhead per parameter.
         self.overhead = overhead_time
 
-    def info(self):
+    def info(self) -> InputDict:
         """
         Returns a copy of the information used to create the model, including defaults
         and some new values that are only available after initialisation.
@@ -197,7 +197,7 @@ class Model(HasLogger):
         if hasattr(params_values, "keys"):
             params_values = self.parameterization.check_sampled(**params_values)
         params_values_array = self._to_sampled_array(params_values)
-        logpriors = np.as_array(self.prior.logps(params_values_array))
+        logpriors = np.asarray(self.prior.logps(params_values_array))
         if make_finite:
             return np.nan_to_num(logpriors)
         return logpriors

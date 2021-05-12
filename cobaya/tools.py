@@ -7,6 +7,7 @@
 """
 
 # Global
+from cobaya.component import CobayaComponent
 import os
 import sys
 import logging
@@ -21,7 +22,7 @@ from importlib import import_module
 from copy import deepcopy
 from packaging import version
 from itertools import permutations
-from typing import Mapping, Sequence, Any, List, TypeVar, Optional, Union
+from typing import Mapping, Sequence, Any, List, TypeVar, Optional, Union, Type
 from numbers import Number
 from types import ModuleType
 from inspect import cleandoc, getfullargspec
@@ -210,7 +211,7 @@ def get_class(name, kind=None, None_if_not_found=False, allow_external=True,
             _module = load_module(_module_name + '.' + _class_name,
                                   package=package, path=component_path)
             cls = get_matching_class_name(_module, _class_name)
-        if not inspect.isclass(cls):
+        if not isinstance(cls, type):
             return get_matching_class_name(cls, _class_name)
         else:
             return cls
@@ -255,7 +256,7 @@ def get_class(name, kind=None, None_if_not_found=False, allow_external=True,
 
 
 def get_resolved_class(component_or_class, kind=None, component_path=None,
-                       class_name=None, None_if_not_found=False):
+                       class_name=None, None_if_not_found=False) -> Type[CobayaComponent]:
     """
     Returns the class corresponding to the component indicated as first argument.
 
@@ -263,12 +264,14 @@ def get_resolved_class(component_or_class, kind=None, component_path=None,
     retrieves the corresponding class name, using the value of `class_name` instead if
     present.
     """
-    if inspect.isclass(component_or_class):
-        return component_or_class
-    else:
-        return get_class(class_name or component_or_class, kind,
-                         component_path=component_path,
-                         None_if_not_found=None_if_not_found)
+    if isinstance(component_or_class, str):
+        component_or_class = get_class(class_name or component_or_class, kind,
+                                       component_path=component_path,
+                                       None_if_not_found=None_if_not_found)
+
+    assert isinstance(component_or_class, type) and issubclass(
+        component_or_class, CobayaComponent)
+    return component_or_class
 
 
 def import_all_classes(path, pkg, subclass_of, hidden=False, helpers=False):
@@ -796,7 +799,7 @@ def deepcopy_where_possible(base: _R) -> _R:
             _copy[key] = deepcopy_where_possible(value)
         return _copy  # type: ignore
     if isinstance(base, (HasLogger, type)):
-        return base # type: ignore
+        return base  # type: ignore
     else:
         try:
             return deepcopy(base)

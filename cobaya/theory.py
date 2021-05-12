@@ -30,7 +30,6 @@ see :doc:`theories_and_dependencies`.
 
 """
 
-import inspect
 from collections import deque
 from typing import Sequence, Optional, Union, Tuple, Dict, Iterable, Set, Any
 # Local
@@ -381,7 +380,7 @@ class TheoryCollection(ComponentCollection):
                 else:
                     if "external" in info:
                         theory_class = info["external"]
-                        if not inspect.isclass(theory_class) or \
+                        if not isinstance(theory_class, type) or \
                                 not issubclass(theory_class, Theory):
                             raise LoggedError(self.log,
                                               "Theory %s is not a Theory subclass", name)

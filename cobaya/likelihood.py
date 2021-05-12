@@ -23,7 +23,6 @@ class can be used as and when needed.
 """
 
 # Global
-import inspect
 from time import sleep
 from typing import Mapping, Optional, Union, Dict
 from itertools import chain
@@ -280,7 +279,7 @@ class LikelihoodCollection(ComponentCollection):
                 external = info["external"]
                 if isinstance(external, Theory):
                     self.add_instance(name, external)
-                elif inspect.isclass(external):
+                elif isinstance(external, type):
                     if not is_LikelihoodInterface(external) or \
                             not issubclass(external, Theory):
                         raise LoggedError(self.log, "%s: external class likelihood must "
@@ -297,7 +296,7 @@ class LikelihoodCollection(ComponentCollection):
                                                                        timing=timing))
             else:
                 assert isinstance(info, Mapping)
-                like_class = get_resolved_class(
+                like_class: type = get_resolved_class(
                     name, kind="likelihood",
                     component_path=info.get("python_path", None),
                     class_name=info.get("class"))

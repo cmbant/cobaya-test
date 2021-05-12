@@ -260,18 +260,18 @@ def update_info(info: _Dict) -> _Dict:
                     log, "Your input info is not well formatted at the '%s' block. "
                          "It must be a dictionary {'%s_i':{options}, ...}. ",
                     block, block)
-            if isinstance(name, CobayaComponent) or inspect.isclass(name):
+            if isinstance(name, CobayaComponent) or isinstance(name, type):
                 raise LoggedError(log, "Instances and classes should be passed a "
                                        "dictionary entry of the form 'name: instance'")
             if isinstance(input_block[name], CobayaComponent):
                 log.warning("Support for input instances is experimental")
-            if inspect.isclass(input_block[name]) or \
+            if isinstance(input_block[name], type) or \
                     not isinstance(input_block[name], dict):
                 input_block[name] = {"external": input_block[name]}
             ext = input_block[name].get("external")
             annotations = {}
             if ext:
-                if inspect.isclass(ext):
+                if isinstance(ext, type):
                     default_class_info, annotations = \
                         get_default_info(ext, block, input_options=input_block[name],
                                          return_undefined_annotations=True)
