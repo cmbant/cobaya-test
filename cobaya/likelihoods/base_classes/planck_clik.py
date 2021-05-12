@@ -324,6 +324,19 @@ def install_clik(path, no_progress_bars=False):
         return False
     source_dir = get_clik_source_folder(path)
     log.info('Installing from directory %s' % source_dir)
+    # The following code patches a problem with the download source of cfitsio.
+    # Left here in case the FTP server breaks again.
+    if True:  # should be fixed: maybe a ping to the FTP server???
+        log.info("Patching origin of cfitsio")
+        cfitsio_filename = os.path.join(source_dir, "clik_extra_env")
+        with open(cfitsio_filename, "r") as cfitsio_file:
+            lines = cfitsio_file.readlines()
+            i_offending = next(i for i, l in enumerate(lines) if ".tar.gz" in l)
+            lines[i_offending] = lines[i_offending].replace(
+                "https://heasarc.gsfc.nasa.gov/FTP/software/fitsio/c/cfitsio_latest.tar.gz",
+                "https://heasarc.gsfc.nasa.gov/FTP/software/fitsio/c/cfitsio3280.tar.gz")
+        with open(cfitsio_filename, "w") as cfitsio_file:
+            cfitsio_file.write("".join(lines))
     cwd = os.getcwd()
     try:
         os.chdir(source_dir)
