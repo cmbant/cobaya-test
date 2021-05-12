@@ -7,7 +7,6 @@
 """
 
 # Global
-from cobaya.component import CobayaComponent
 import os
 import sys
 import logging
@@ -22,7 +21,7 @@ from importlib import import_module
 from copy import deepcopy
 from packaging import version
 from itertools import permutations
-from typing import Mapping, Sequence, Any, List, TypeVar, Optional, Union, Type
+from typing import Mapping, Sequence, Any, List, TypeVar, Optional, Union
 from numbers import Number
 from types import ModuleType
 from inspect import cleandoc, getfullargspec
@@ -256,21 +255,18 @@ def get_class(name, kind=None, None_if_not_found=False, allow_external=True,
 
 
 def get_resolved_class(component_or_class, kind=None, component_path=None,
-                       class_name=None, None_if_not_found=False) -> Type[CobayaComponent]:
+                       class_name=None, None_if_not_found=False):
     """
     Returns the class corresponding to the component indicated as first argument.
 
     If the first argument is a class, it is simply returned. If it is a string, it
     retrieves the corresponding class name, using the value of `class_name` instead if
-    present.
+    present.`
     """
     if isinstance(component_or_class, str):
         component_or_class = get_class(class_name or component_or_class, kind,
                                        component_path=component_path,
                                        None_if_not_found=None_if_not_found)
-
-    assert isinstance(component_or_class, type) and issubclass(
-        component_or_class, CobayaComponent)
     return component_or_class
 
 
