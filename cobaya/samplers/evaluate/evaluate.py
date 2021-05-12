@@ -16,8 +16,11 @@ from cobaya.collection import SampleCollection
 from cobaya.log import LoggedError
 
 
-class evaluate(Sampler):
+class Evaluate(Sampler):
+    file_base_name = 'evaluate'
+
     override: Mapping[str, float]
+    N: int
 
     def initialize(self):
         """
@@ -26,7 +29,7 @@ class evaluate(Sampler):
         """
         try:
             self.N = int(self.N)
-        except:
+        except ValueError:
             raise LoggedError(
                 self.log,
                 "Could not convert the number of samples to an integer: %r", self.N)
@@ -90,6 +93,7 @@ class evaluate(Sampler):
         Auxiliary function to define what should be returned in a scripted call.
 
         Returns:
-           The sample ``SampleCollection`` containing the sequentially discarded live points.
+           The sample ``SampleCollection`` containing the
+           sequentially discarded live points.
         """
         return {"sample": self.one_point}

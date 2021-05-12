@@ -17,7 +17,7 @@ import os
 # Local
 from cobaya.conventions import overhead_time, debug_default, get_chi2_name
 from cobaya.typing import InfoDict, InputDict, LikesDict, TheoriesDict, \
-    ParamsDict, PriorsDict, ParamValuesDict, ArrayLike, empty_dict, unset_params
+    ParamsDict, PriorsDict, ParamValuesDict, empty_dict, unset_params
 from cobaya.input import update_info, load_input_dict
 from cobaya.parameterization import Parameterization
 from cobaya.prior import Prior
@@ -85,7 +85,7 @@ def _dict_equal(d1, d2):
     if isinstance(d1, str):
         return d1 == d2
     if isinstance(d1, Mapping):
-        if set(list(d1)) != set(list(d2)):
+        if set(d1) != set(d2):
             return False
         for k, v in d1.items():
             if not _dict_equal(v, d2[k]):
@@ -179,7 +179,7 @@ class Model(HasLogger):
                 self.log, "Cannot take arrays of points as inputs, just single points.")
         return params_values_array
 
-    def logpriors(self, params_values, make_finite=False) -> ArrayLike:
+    def logpriors(self, params_values, make_finite=False) -> np.ndarray:
         """
         Takes an array or dictionary of sampled parameter values.
         If the argument is an array, parameters must have the same order as in the input.
@@ -197,7 +197,7 @@ class Model(HasLogger):
         if hasattr(params_values, "keys"):
             params_values = self.parameterization.check_sampled(**params_values)
         params_values_array = self._to_sampled_array(params_values)
-        logpriors = self.prior.logps(params_values_array)
+        logpriors = np.as_array(self.prior.logps(params_values_array))
         if make_finite:
             return np.nan_to_num(logpriors)
         return logpriors

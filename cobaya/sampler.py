@@ -47,7 +47,7 @@ implement only the methods ``initialize``, ``_run``, and ``products``.
 import os
 import logging
 import numpy as np
-from typing import Optional, Sequence, Mapping, Union, Any
+from typing import Optional, Sequence, Mapping, Union
 from itertools import chain
 from numpy.random import SeedSequence, default_rng
 
@@ -141,7 +141,8 @@ def get_sampler(info_sampler: SamplersDict, model: Model, output: Optional[Outpu
         output = OutputDummy()
     # Check and update info
     check_sane_info_sampler(info_sampler)
-    updated_info_sampler = update_info({"sampler": info_sampler})["sampler"]
+    updated_info_sampler = update_info(
+        {"sampler": info_sampler})["sampler"]  # type: ignore
     if logging.root.getEffectiveLevel() <= logging.DEBUG:
         logger_sampler.debug(
             "Input info updated with defaults (dumped to YAML):\n%s",
@@ -170,7 +171,7 @@ class Sampler(CobayaComponent):
 
     # What you *must* implement to create your own sampler:
 
-    seed: Any
+    seed: Union[None, int, Sequence[int]]
     version: Optional[Union[dict, str]] = None
 
     _rng: np.random.Generator

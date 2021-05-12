@@ -215,7 +215,7 @@ def post(info_or_yaml_or_file: Union[InputDict, str, os.PathLike],
             # Only one possibility left "fixed" parameter that was not present before:
             # input of new likelihood, or just an argument for dynamical derived (dropped)
             if ((p in info_in["params"] and
-                 pinfo["value"] != (pinfo_in or {}).get("value", None))):
+                 pinfo["value"] != (pinfo_in or {}).get("value"))):
                 raise LoggedError(
                     log,
                     "You tried to add a fixed parameter '%s: %r' that was already present"
@@ -236,7 +236,7 @@ def post(info_or_yaml_or_file: Union[InputDict, str, os.PathLike],
     out_params_with_computed = deepcopy_where_possible(out_combined["params"])
     dropped_theory = set()
     for p, pinfo in out_params_with_computed.items():
-        if (is_derived_param(pinfo) and not ("value" in pinfo)
+        if (is_derived_param(pinfo) and "value" not in pinfo
                 and p not in add.get("params", {})):
             out_params_with_computed[p] = {"value": np.nan}
             dropped_theory.add(p)
@@ -247,7 +247,7 @@ def post(info_or_yaml_or_file: Union[InputDict, str, os.PathLike],
         for remove_item in str_to_list(remove.get(kind)) or []:
             try:
                 out_combined[kind].pop(remove_item, None)
-                if remove_item not in add.get(kind, {}) or [] and kind != "theory":
+                if remove_item not in (add.get(kind) or []) and kind != "theory":
                     warn_remove = True
             except ValueError:
                 raise LoggedError(

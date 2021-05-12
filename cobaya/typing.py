@@ -1,5 +1,4 @@
 from typing import Dict, Any, Optional, Union, Sequence, Type, Callable, Mapping
-import numpy as np
 from types import MappingProxyType
 import sys
 
@@ -73,8 +72,6 @@ if sys.version_info >= (3, 8):
         max: float
 
 
-    # partags = set(ParamDict.__annotations__)
-
     class ModelDict(TypedDict, total=False):
         theory: TheoriesDict
         likelihood: LikesDict
@@ -112,11 +109,3 @@ else:
     globals().update((k, InfoDict) for k in
                      ('InputDict', 'ParamDict', 'ModelDict', 'PostDict'))
     globals()['LiteralFalse'] = bool
-
-try:
-    from numpy.typing import ArrayLike
-except ImportError:
-    ArrayLike = Union[Sequence, np.ndarray]
-
-OptionalArrayLike = Optional[ArrayLike]
-ArrayOrFloat = Union[float, ArrayLike]

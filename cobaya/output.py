@@ -338,7 +338,7 @@ class Output(HasLogger):
                         continue
                     for c in updated_info[k]:
                         new_version = updated_info[k][c].get("version")
-                        old_version = old_info[k][c].get("version")
+                        old_version = old_info[k][c].get("version")  # type: ignore
                         if new_version is None:
                             updated_info[k][c]["version"] = old_version
                             updated_info_trimmed[k][c]["version"] = old_version
